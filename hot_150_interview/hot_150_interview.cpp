@@ -741,11 +741,11 @@ const pair<int, string> Solution_12::map[] = {
 {1,"I"},
 };
 
-int main() {
-	Solution_12 solution;
-	string a= solution.intToRoman(6666);
-	cout << a << endl;
-}
+//int main() {
+//	Solution_12 solution;
+//	string a= solution.intToRoman(6666);
+//	cout << a << endl;
+//}
 
 
 
