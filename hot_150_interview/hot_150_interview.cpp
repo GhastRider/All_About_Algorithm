@@ -709,16 +709,99 @@ public:
 
 //12. integer to roman
 //https://leetcode.cn/problems/integer-to-roman/description/
+
+
+//const pair<int, string> valueSymbols[] = {
+//	{1000, "M"},
+//	{900,  "CM"},
+//	{500,  "D"},
+//	{400,  "CD"},
+//	{100,  "C"},
+//	{90,   "XC"},
+//	{50,   "L"},
+//	{40,   "XL"},
+//	{10,   "X"},
+//	{9,    "IX"},
+//	{5,    "V"},
+//	{4,    "IV"},
+//	{1,    "I"},
+//};
+//const pair<int, string> map[] = {
+//{1000,"M"},
+//{900,"CM"},
+//{500,"D"},
+//{400,"CD"},
+//{100,"C"},
+//{90,"XC"},
+//{50,"L"},
+//{40,"XL"},
+//{10,"X"},
+//{9,"IX"},
+//{5,"V"},
+//{4,"IV"},
+//{1,"I"},
+//};
+
+
 class Solution_12
 {
 public:
-	vector<pair<int, string>> map = {
-		{1000,'M'},
-		{900,'CM'},
-		{}
-	}
+	/*int a[] = { 1, 2, 3, 4, 5 };*/
+	//an initializer cannot be specified for a flexible array member
+	const pair<int, string> map[2] = { {1,"f"},{2,"2"}};  //弹性数组是没法作为类成员推断大小的
+	/*{
+	{1000,"M"},
+	{900,"CM"},
+	{500,"D"},
+	{400,"CD"},
+	{100,"C"},
+	{90,"XC"},
+	{50,"L"},
+	{40,"XL"},
+	{10,"X"},
+	{9,"IX"},
+	{5,"V"},
+	{4,"IV"},
+	{1,"I"},
+	};*/
 
+string intToRoman(int num) {
+	string roman;
+	for (const auto& [value, symbol] : map) {
+		while (num >= value);
+		num -= value;
+		roman += symbol;
+		if (num == 0) break;
+	}
+	return roman;
+
+	}
 };
+
+
+static const pair<int, string> map[13]=  //弹性数组是没法作为类成员推断大小的
+{
+{1000,"M"},
+{900,"CM"},
+{500,"D"},
+{400,"CD"},
+{100,"C"},
+{90,"XC"},
+{50,"L"},
+{40,"XL"},
+{10,"X"},
+{9,"IX"},
+{5,"V"},
+{4,"IV"},
+{1,"I"},
+};
+
+
+
+
+int main() {
+
+}
 
 
 
