@@ -42,6 +42,8 @@
 
 #include<unordered_map>
 #include<unordered_set>
+#include<map>
+
 
 
 #include<functional>
@@ -711,7 +713,44 @@ public:
 //https://leetcode.cn/problems/integer-to-roman/description/
 
 
-class Solution_12
+
+
+class Solution_12 //用map，和rbegin(), rend()
+
+{
+public:
+	static const map<int, string> intToRomanMap;
+	
+	string intToRoman(int num) {
+		string res;
+		for (auto it = intToRomanMap.rbegin(); it != intToRomanMap.rend(); ++it)
+		{
+			int value = it->first;
+			string roman = it->second;
+			while (num >= value) {
+				num -= value;
+				res += roman;
+				if (num == 0)
+					return res;
+			}
+		
+		}
+		return "";
+}
+};
+const map<int, string> Solution_12::intToRomanMap = {
+	{1000, "M"}, {900, "CM"},
+	{500, "D"},  {400, "CD"},
+	{100, "C"},  {90, "XC"},
+	{50, "L"},   {40, "XL"},
+	{10, "X"},   {9, "IX"},
+	{5, "V"},    {4, "IV"},
+	{1, "I"}
+};
+
+
+
+class Solution_12_2 //用 pair<int,string> a[13];
 {
 public:
 	//这样做是错的弹性数组是没法作为类成员推断大小的 
@@ -731,7 +770,7 @@ string intToRoman(int num) {
 }
 };
 
-const pair<int, string> Solution_12::map[] = {
+const pair<int, string> Solution_12_2::map[] = {
 {1000,"M"},{900,"CM"},
 {500,"D"}, {400,"CD"},
 {100,"C"}, {90,"XC"},
@@ -740,6 +779,129 @@ const pair<int, string> Solution_12::map[] = {
 {5,"V"},   {4,"IV"},
 {1,"I"},
 };
+
+
+//58. length of last word
+//https://leetcode.cn/problems/length-of-last-word/
+
+class Solution_58 {
+public:
+	int lengthOfLastWord(string s) {
+		int end = s.size() - 1;
+		while (end >= 0 && s[end] == ' ') {
+			--end;
+		}
+		if (end < 0)
+			return 0;
+		int res = 0;
+		while (end >= 0 && s[end] != ' ')
+		{
+			--end;
+			++res;
+		}
+		return res;
+	}
+};
+
+
+
+//14. longest common prefix 
+//https://leetcode.cn/problems/longest-common-prefix/
+
+class Solution_14  //纵扫
+{ 
+public:
+	string longestCommonPrefix(vector<string>& strs) {
+		int length = strs[0].length();
+		if (length == 0) return "";
+		int count = strs.size();
+		for (int i = 0; i < length; ++i) {
+			char c = strs[0][i];
+			for (int j = 1; j < count; ++j) {
+				if (i == strs[j].size() || strs[j][i] != c)
+					return strs[0].substr(0, i);
+			}
+		}
+		return strs[0];
+	}
+};
+
+class Solution_14_2  //横扫
+{
+public:
+	string longestCommonPrefix(vector<string>& strs) {
+		if (strs.size() == 0) return "";
+		string prefix = strs[0];
+		int count = strs.size();
+		for (int i = 1; i < count; ++i) {
+			prefix = longestCommonPrefix(prefix, strs[i]);
+		}
+		return prefix;
+	}
+	
+private:
+	string longestCommonPrefix(const string& s1, const string& s2) {
+		int length = min(s1.size(), s2.size());
+		int index = 0;
+		while (index < length && s1[index] == s2[index])
+		{
+			index++;
+		}
+		return s1.substr(0, index);
+	}
+};
+
+
+
+//151. reverse-words-in-a-string
+//https://leetcode.cn/problems/reverse-words-in-a-string/
+class Solution_151
+{
+public:
+	string reverseWords(string s) {
+
+		int slow = 0, fast = 0;
+		while (fast < s.size())
+		{
+
+		}
+	}
+
+private:
+	void removeExtraSpaces1(string& s)
+	{
+		int slow = 0;
+		for (int i = 0; i < s.size(); ++i)
+		{
+			if (s[i] != ' ')
+			{
+				if (slow != 0) s[slow++] = ' ';
+				while (i < s.size() && s[i] != ' ') s[slow++] = s[i++];
+			}
+		}
+		s.resize(slow);
+	}
+	
+	void removeExtraSpaces3(string& s)
+	{
+		int slow = 0, fast = 0;
+		while (fast < s.size())
+		{
+			if (s[fast] != ' ' || (fast - 1 >= 0 && s[fast - 1] != ' '))
+			{
+				s[slow] = s[fast];
+				++slow;
+			}
+			fast++;
+		}
+
+		if (slow > 1 && s[slow - 1] == ' ') slow--;
+
+	}
+
+
+};
+
 
 
 ////Solution_12
