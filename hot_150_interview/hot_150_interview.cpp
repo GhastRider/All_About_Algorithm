@@ -336,7 +336,8 @@ public:
 		int buyin = prices[0];
 		for (int i = 0; i < prices.size(); ++i) {
 			buyin = min(buyin, prices[i]);//更新前i天的最低价格
-			result = max(result, prices[i] - buyin);//更新前i天的最高利润：i-1天最高利润和第i天卖出最高利润price
+			//更新前i天的最高利润：i-1天最高利润和第i天卖出最高利润price
+			result = max(result, prices[i] - buyin);
 		}
 		return result;
 	}
@@ -621,7 +622,8 @@ public:
 			if (ratings[i] > ratings[i - 1]) result[i] = result[i - 1] + 1;
 		}
 		for (int i = n - 2; i >= 0; --i) {
-			if (ratings[i] > ratings[i + 1] && !(result[i] > result[i + 1])) result[i] = result[i + 1] + 1;
+			if (ratings[i] > ratings[i + 1] && 
+				!(result[i] > result[i + 1])) result[i] = result[i + 1] + 1;
 		}
 		return accumulate(result.begin(), result.end(), 0);
 	}
@@ -754,7 +756,8 @@ class Solution_12_2 //用 pair<int,string> a[13];
 {
 public:
 	//这样做是错的弹性数组是没法作为类成员推断大小的 
-	//int a[] = { 1, 2, 3, 4, 5 }; //an initializer cannot be specified for a flexible array member
+	//an initializer cannot be specified for a flexible array member
+	//int a[] = { 1, 2, 3, 4, 5 }; 
 	static const pair<int, string> map[13];  
 
 string intToRoman(int num) {
@@ -858,25 +861,35 @@ private:
 class Solution_151
 {
 public:
+		
 	string reverseWords(string s) {
-
-		int slow = 0, fast = 0;
-		while (fast < s.size())
-		{
-
+		removeExtraSpaces1(s);
+		reverse(s, 0, s.size() - 1);
+		int cur_start = 0;
+		for (int i = 0; i <= s.size(); ++i) {
+			if (s[i] == ' ' || i == s.size())
+			{
+				reverse(s, cur_start, i - 1);
+				cur_start = i + 1;
+			}
 		}
 	}
 
 private:
+	//string s; //也可以把s设为成员变量
 	void removeExtraSpaces1(string& s)
 	{
 		int slow = 0;
 		for (int i = 0; i < s.size(); ++i)
 		{
-			if (s[i] != ' ')
-			{
+			if (s[i] != ' ')//只有s[i]遍历到不是空格的时候才处理
+			{	
+				//只要slow指针不是0，说明slow指向的不是开头第一个单词第一个字母，
+				// ,这时s[i]不等于空格的话，说明是碰到非第一个单词的新单词，
+				// 遂s[slow]加空格
 				if (slow != 0) s[slow++] = ' ';
 				while (i < s.size() && s[i] != ' ') s[slow++] = s[i++];
+				//跳出这个while的时候，说明s[i]到空格了，或者s[i]遍历结束了
 			}
 		}
 		s.resize(slow);
@@ -898,9 +911,97 @@ private:
 		if (slow > 1 && s[slow - 1] == ' ') slow--;
 
 	}
-
-
+	void reverse(string& s,int l,int r) {
+		while (l < r) swap(s[l++], s[r--]);
+	}	
 };
+
+
+
+//6. zigzag conversion
+//https://leetcode.cn/problems/zigzag-conversion/
+
+class Solution_6 //K神题解
+{
+public:
+	string convert(string s, int numRows) {
+		if (numRows == 1) return s;
+		vector<string> rows(numRows);
+		int flag = 1;// 行转向标志
+		int idxRows = 0;// 行下标索引
+		for (int i = 0; i < s.size(); i++) {
+			rows[idxRows].push_back(s[i]);
+			idxRows += flag;// 更新行下标
+			if (idxRows == numRows - 1 || idxRows == 0) {
+				flag = -flag;//转向
+			}
+		}
+		string res;
+		for (auto row : rows) {
+			// 拿到答案
+			res += row;
+		}
+		return res;
+	}
+};
+
+
+
+//28. find-the-index-of-the-first-occurrence-in-a-string
+//https://leetcode.cn/problems/find-the-index-of-the-first-occurrence-in-a-string/
+class Solution_28 //the Legendary KMP
+//KMP: 匹配成功的部分中存在相同的【前缀】和【后缀】, 
+//so, 不需要从头匹配，可以将匹配串指针移至【前缀】下一个位置继续匹配
+//=================================================================
+//关于用形参string大小来初始化类内函数内的局部变量大小,
+//在 LeetCode 的某些环境下，它可能会启用变长数组 (VLA) 扩展，
+// 允许在运行时指定数组大小，但是这不是标准 C++ 的特性，
+// 因此在标准编译器上会出错。
+{
+public:
+	int strStr(string haystack, string needle)
+	{
+		
+		
+		//int next[needle.size()]; 这行代码中，needle.size() 是在运行时才能得到的，
+		// 而 C++ 要求数组的大小必须是编译时已知的常量，因此编译器会报错
+		
+		vector<int> next(needle.size());
+		
+	}
+private:
+	void getNext(const string& p, vector<int>& next)
+	{
+		int k = -1;
+		next[0] = -1;
+		int j = 0;
+		while (j < p.size() - 1) {
+			if (k == -1 || p[j] == p[k])
+			{
+				next[++j] = ++k;
+			}
+		}
+	}
+};
+
+class Solution_28_2 //violent match
+{
+public:
+	int strStr(string s, string p) {
+		int n = s.size(), m = p.size();
+		for (int i = 0; i <= n - m; ++i)
+		{
+			int j = i, k = 0;
+			while (k < m && s[j] == p[k]) {
+				++j;
+				++k;
+			}
+			if (k == m) return i;
+		}
+		return -1;
+	}
+};
+
 
 
 
@@ -1009,5 +1110,7 @@ int main() {
 //   2. Use the Team Explorer window to connect to source control
 //   3. Use the Output window to see build output and other messages
 //   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+//   5. Go to Project > Add New Item to create new code files, 
+// or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, 
+// go to File > Open > Project and select the .sln file
