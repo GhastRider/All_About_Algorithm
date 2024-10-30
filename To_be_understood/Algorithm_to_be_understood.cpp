@@ -28,4 +28,128 @@ public:
 		return ans;
 	}
 };
-f
+
+
+
+
+//28. find-the-index-of-the-first-occurrence-in-a-string
+//https://leetcode.cn/problems/find-the-index-of-the-first-occurrence-in-a-string/
+//the Legendary KMP -unfinished
+//KMP: 匹配成功的部分中存在相同的【前缀】和【后缀】, 
+//so, 不需要从头匹配，可以将匹配串指针移至【前缀】下一个位置继续匹配
+//===========================================================
+
+//#include <iostream>
+//#include <string>
+//#include <vector>
+class Solution_28 {
+public:
+    int strStr(string haystack, string needle) {
+        if (needle.empty()) return 0;  // 边界条件，空模式串返回0
+
+        vector<int> next(needle.size(), 0);
+        buildNextArray(needle, next);  // 构建 next 数组
+
+        int i = 0, j = 0;
+        while (i < haystack.size()) {
+            if (j == -1 || haystack[i] == needle[j]) {
+                i++;
+                j++;
+            }
+            else {
+                j = next[j];  // 根据 next 数组调整模式串指针
+            }
+
+            // 如果完全匹配，返回匹配的起始位置
+            if (j == needle.size()) {
+                return i - j;
+            }
+        }
+
+        return -1;  // 如果没有匹配到，返回 -1
+    }
+
+private:
+    void buildNextArray(const string& p, vector<int>& next) {
+        int j = -1;
+        next[0] = -1;
+        for (int i = 1; i < p.size(); ++i) {
+            while (j >= 0 && p[i] != p[j + 1]) {
+                j = next[j];  // 回退
+            }
+            if (p[i] == p[j + 1]) {
+                j++;
+            }
+            next[i] = j;
+        }
+    }
+};
+
+//int main() {
+//    Solution_28 solution;
+//    string haystack = "hello";
+//    string needle = "ll";
+//    cout << solution.strStr(haystack, needle) << endl;  // 输出 2
+//    return 0;
+//}
+
+
+
+
+
+//68. text-justification
+//https://leetcode.cn/problems/text-justification/solutions/181651/text-justification-by-ikaruga/
+
+class Solution_68 //lkaruga题解
+{
+private:
+	string fillWords(vector<string>& words, int bg, int ed, int maxWidth, bool lastLine = false)
+	{
+		int wordCount = ed - bg + 1;
+		int spaceCount = maxWidth - (-1 + wordCount);
+
+		//额外空格数量=总长度-正常空格数量-单词长度。
+
+		for (int i = bg; i <= ed; ++i)
+		{
+			spaceCount -= words[i].size();
+		}
+
+		int spaceSuffix = 1;
+		int spaceAvg = (wordCount == 1) ? 1 : spaceCount / (wordCount - 1);
+		int spaceExtra = (wordCount == 1) ? 0 : spaceCount % (wordCount - 1);
+
+		string ans;
+		for (int i = bg; i < ed; ++i) {
+			ans += words[i];
+			if (lastLine)
+			{
+				fill_n(back_inserter(ans), 1, ' ');
+				continue;
+			}
+			fill_n(back_inserter(ans), spaceSuffix + spaceAvg + ((i - bg) < spaceExtra), ' ');
+		}
+		ans += words[ed];
+		fill_n(back_inserter(ans), maxWidth - ans.size(), ' ');
+		return ans;
+	}
+public:
+	vector<string> fullJustify(vector<string>& words, int maxWidth)
+	{
+		vector<string> ans;
+		int cnt = 0;
+		int bg = 0;
+		for (int i = 0; i < words.size(); ++i)
+		{
+			cnt += words[i].size() + 1;
+			if (i + 1 == words.size() || cnt + words[i + 1].size() > maxWidth)
+			{
+				ans.push_back(fillWords(words, bg, i, maxWidth, i + 1 == words.size()));
+				bg = i + 1;
+				cnt = 0;
+
+			}
+		}
+		return ans;
+	}
+};

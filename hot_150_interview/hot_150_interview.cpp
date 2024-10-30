@@ -1061,6 +1061,86 @@ public:
 };
 
 
+//125. valid palindrome
+//https://leetcode.cn/problems/valid-palindrome/
+
+
+//按位或：|0x20 作用是大写字母转为小写
+class Solution_125 //对撞指针
+{
+public:
+	bool isPalindrome(string s)
+	{
+		int left = 0, right = s.size() - 1;
+		while (left < right) {
+			if (!isalnum(s[left]))
+			{
+				left++;
+				continue;
+			}
+			if (!isalnum(s[right]))
+			{
+				right--;
+				continue;
+			}
+			if ((s[left] | 0x20) != (s[right] | 0x20))
+			{
+				return false;
+			}
+			++left; --right;
+		}
+	}
+};
+
+
+//392. is subsequence
+//https://leetcode.cn/problems/is-subsequence/
+
+class Solution_392
+{
+public:
+	bool isSubsequence(string s, string t)
+	{
+		int s_pointer = 0;
+		for (int i = 0; i < t.size(); ++i) {
+			if (s[s_pointer] == t[i])
+				s_pointer++;
+		}
+		return s_pointer == s.size();
+	}
+};
+
+//167. two-sum-ii-input-array-is-sorted/
+//https://leetcode.cn/problems/two-sum-ii-input-array-is-sorted/
+class Solution_167 //一层循环内套二分，violent 会超时
+{
+public:
+	vector<int> twoSum(vector<int>& numbers, int target) {
+		int n = numbers.size();
+		for (int i = 0; i < n; ++i)
+		{
+			int l = i + 1, r = n - 1;
+			int sub_target = target-numbers[i];
+
+			while (l < r)
+			{
+				int mid = l + r >> 1;
+				if (numbers[mid] >= sub_target) {
+					r = mid;
+				}
+				else l = mid+1;
+			}
+			return { i + 1, r + 1 };
+		}
+		return vector<int>(2);
+	}
+};
+
+class Solution_167_2
+{
+public:
+	
+};
 
 
 
