@@ -5,12 +5,12 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hot_150_interview", "hot_150_interview\hot_150_interview.vcxproj", "{C5318482-3320-491F-ACC9-06268F5AA92F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zxf150", "zxf150", "{B50A2517-E791-47BE-A97E-5BBF07806061}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\源.cpp = ..\..\源.cpp
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "To_be_understood", "To_be_understood\To_be_understood.vcxproj", "{5C4FD5EE-9CBC-4900-B6ED-E2E3202C22AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zxf_150", "zxf_150", "{C2BA65F2-9B45-47FD-9086-1840E477334F}"
+	ProjectSection(SolutionItems) = preProject
+		zxf_150\源.cpp = zxf_150\源.cpp
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
