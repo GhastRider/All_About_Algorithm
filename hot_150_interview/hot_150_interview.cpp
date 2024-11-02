@@ -1136,10 +1136,29 @@ public:
 	}
 };
 
-class Solution_167_2
+class Solution_167_2 //双指针
+// 左右指针代表：这个范围内是可能考虑项。
+// 如果已经在left左，或者right右，代表已经不会考虑了。
+// 如果左右之和小于target代表：目前范围最大的可能和最小的可能之和已经达不到要求了，
+// 那么这个最小可能就要排除在外，所以left右移。大于target同理。
 {
 public:
-	
+	vector<int> twoSum(vector<int>& numbers, int target) {
+		int low = 0, high = numbers.size() - 1;
+		while (low < high) {
+			int sum = numbers[low] + numbers[high];
+			if (sum == target) {
+				return { low + 1,high + 1 };
+			}
+			else if (sum < target) {
+				++low;
+			}
+			else {
+				--high;
+			}
+		}
+		return { -1,-1 };
+	}
 };
 
 
