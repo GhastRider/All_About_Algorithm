@@ -44,9 +44,12 @@
 #include<unordered_set>
 #include<map>
 
-
-
 #include<functional>
+
+
+//C++ 20
+#include<ranges>
+
 
 using namespace std;
 
@@ -1065,7 +1068,7 @@ public:
 //https://leetcode.cn/problems/valid-palindrome/
 
 
-//按位或：|0x20 作用是大写字母转为小写
+//按位或：|0x20 作用是大写字母转为小写(大写字母打ASCII码+32)
 class Solution_125 //对撞指针
 {
 public:
@@ -1163,6 +1166,315 @@ public:
 
 
 
+//11. container with most water
+class Solution_11		//双指针
+{
+public:
+	int maxArea(vector<int>& height) {
+		int maxV = 0;
+		int left = 0, right = height.size() - 1;
+		int lheighest = height[0]; int rheighest = height[right];
+		while (left < right)
+		{
+			if (height[left] < height[right])
+			{
+				if (height[left] < lheighest)
+				{
+					left++;
+					continue;
+				}
+				else {
+					maxV = (height[left] * (right - left) < maxV) ? maxV : (height[left] * (right - left));
+					lheighest = height[left++];
+				}
+			}
+			else
+			{
+				if (height[right] < rheighest)
+				{
+					right--;
+					continue;
+				}
+				else {
+					maxV = (height[right] * (right - left) < maxV) ? maxV : (height[right] * (right - left));
+					rheighest = height[right--];
+				}
+			}
+		}
+		return maxV;
+	}
+};
+
+class Solution_11_2 // 双指针简便写法
+{
+public:
+	int maxArea(vector<int>& height) {
+		int l = 0, r = height.size() - 1;
+		int lcapacity = -1;
+		while (l < r) {
+			lcapacity = max(lcapacity, min(height[l], height[r]) * r - l);
+			if (height[l] < height[r]) {
+				l++;
+			}
+			else {
+				r--;
+			}
+		}
+		return lcapacity;
+	}
+};
+
+//15. 3sum
+//https://leetcode.cn/problems/3sum/
+class Solution_15	// 内层双指针
+{
+public:
+	vector<vector<int>> threeSum(vector<int>& nums) {
+		//ranges::sort(nums);// why? error reason：MSVS版本问题，导致设置成C++20也没法正常使用ranges
+		//std::ranges::sort
+		//sort(nums.begin(), nums.end());
+		vector<vector<int>> ans;
+		sort(nums.begin(), nums.end());
+		int n = nums.size();
+		for (int i = 0; i < n - 2; ++i) {
+			int x = nums[i];
+			if(i && x==nums[i-1]) continue;
+			if (x + nums[i + 1] + nums[i + 2] > 0) break;
+			if (x + nums[n - 2] + nums[n - 1] < 0) continue;
+			int j = i + 1, k = n - 1;
+			while (j < k) {
+				int s = x + nums[j] + nums[k];
+				if (s > 0) {
+					k--;
+				}
+				else if (s < 0) {
+					++j;
+				}
+				else {
+					ans.push_back({ x, nums[j],nums[k] });
+					for (j++; j < k && nums[j] == nums[j - 1]; j++);
+					for (k--; k > j && nums[k] == nums[k + 1]; k--);
+				}
+			}
+		}
+		return ans;
+	}
+};
+
+
+
+//209. minimum-size subarray sum 
+//https://leetcode.cn/problems/minimum-size-subarray-sum/
+
+class Solution_209
+{
+public:
+	int minSubArrayLen(int target, vector<int>& nums) {
+		int res = INT_MAX;
+		int sum = 0;
+		for (int l = 0, r = 0; r < nums.size(); ++r)
+		{
+			sum += nums[r];
+			while (l <= r && sum >= target)
+			{
+				res = min(res, r - l + 1);
+				sum -= nums[l++];
+			}
+		}
+		return res == INT_MAX ? 0 : res;
+	}
+	
+};
+
+
+//3. longest substring without repeating characters
+//https://leetcode.cn/problems/longest-substring-without-repeating-characters/
+class Solution_3 //滑窗 sliding window
+{
+public:
+	int lengthOfLongestSubstring(string s) {
+		unordered_set<char> substr;
+		int n = s.size();
+		int maxlen = 0;
+		for (int l = 0, r = 0; r < n; ++r)
+		{
+			while (substr.count(s[r]))
+			{
+				substr.erase(s[l]);
+				++l;
+			}
+			substr.insert(s[r]);
+			maxlen = max(maxlen, r - l + 1);
+		}
+		return maxlen;
+	}
+};
+
+//30. substring with concatenation of all words
+//https://leetcode.cn/problems/substring-with-concatenation-of-all-words/
+class Solution_30 
+{
+public:
+	vector<int> findSubstring(string s, vector<string>& words) {
+		vector<int> res;
+		int m = words.size(), n = words[0].size(), slen = s.size();
+		for (int i = 0; i < n && i + m * n <= slen; ++i) {
+			unordered_map<string, int> differ;
+			for (int j = 0; j < m; ++j) {
+				++differ[s.substr(i + j * n, n)];
+			}
+			for (string& word : words) {
+				if (--differ[word] == 0)
+				{
+					differ.erase(word);
+				}
+			}
+			for (int start = i; start < slen - m * n + 1; start += n) {
+				if (start != i) {
+					string word = s.substr(start + (m - 1) * n, n);
+					if (++differ[word] == 0)
+					{
+						differ.erase(word);
+					}
+					word = s.substr(start - n, n);
+					if (--differ[word] == 0) {
+						differ.erase(word);
+					}
+				}
+				if (differ.empty()) {
+					res.emplace_back(start);
+				}
+				
+			}
+		}
+		return res;
+	}
+
+};
+
+
+
+//76. minimum windows substring
+//https://leetcode.cn/problems/minimum-window-substring/
+class Solution_76
+{
+public:
+	bool check(vector<int>& t_counter, vector<int>& win)
+	{
+		for (int i = 0; i < 58; ++i)
+		{
+			if (t_counter[i] > win[i]) return false;
+		}
+		return true;
+	}
+	string minWindow(string s, string t) {
+		vector<int> t_counter(58, 0), win(58, 0);
+		for (char c : t)
+		{
+			t_counter[c - 'A']++;
+		}
+		int minLen = INT_MAX, start = -1;
+		for (int l = 0, r = 0; r < s.size(); ++r)
+		{
+			win[s[r] - 'A']++;
+			while (l <= r && check(t_counter, win))
+			{
+				if (r - l + 1 < minLen)
+				{
+					minLen = r - l + 1;
+					start = l;
+				}
+				win[s[l] - 'A']--;
+				l++;
+			}
+		}
+		return start == -1 ? "" : s.substr(start, minLen);
+	}
+};
+
+
+
+//36. valid sudoku
+//https://leetcode.cn/problems/valid-sudoku/
+class Solution_36 //一次遍历
+{
+public:
+	bool isValidSudoku(vector<vector<char>>& board) {
+		int rows[9][9];
+		int columns[9][9];
+		int subboxes[3][3][9];
+		
+		memset(rows, 0, sizeof(rows));
+		memset(columns, 0, sizeof(columns));
+		memset(subboxes, 0, sizeof(subboxes));
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++)
+			{
+				char c = board[i][j];
+				if (c != '.') {
+					int index = c - '0' - 1;
+					rows[i][index]++;
+					columns[j][index]++;
+					subboxes[i / 3][j / 3][index]++;
+					if (rows[i][index] > 1 || columns[j][index] > 1 || subboxes[i / 3][j / 3][index] > 1)
+						return false;
+				}
+			}
+		}
+		return true;
+	}
+};
+
+//73. set matrix zeroes
+//https://leetcode.cn/problems/set-matrix-zeroes/
+class Solution_73 //标记数组
+{
+public:
+	void setZeroes(vector<vector<int>>& matrix) {
+		int m = matrix.size();
+		int n = matrix[0].size();
+		vector<int> row(m), col(n);
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (!matrix[i][j]) {
+					row[i] = col[j] = true;
+				}
+			}
+		}
+		
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j)
+			{
+				if (row[i] || col[j]) {
+					matrix[i][j] = 0;
+				}
+			}
+		}
+	}
+};
+
+
+//1. two-sum
+//https://leetcode.cn/problems/two-sum/
+class Solution_1
+{
+public:
+	vector<int> twoSum(vector<int>& nums, int target) {
+		vector<int> result;
+		unordered_map<int, int> map;
+		for (int i = 0; i < nums.size(); ++i)
+		{
+			auto item = map.find(target - nums[i]);
+			if (item != map.end()) {
+				result = { item->second, i };
+				break;
+			}
+			map[nums[i]] = i;
+		}
+		return result;
+	}
+	
+};
 
 
 ////Solution_12
