@@ -53,25 +53,25 @@
 
 using namespace std;
 
-struct ListNode {
-	int value;
-	ListNode* next;
-
-	//constructor:
-	// : 构造函数初始化列表
-	ListNode() : value(0), next(nullptr) {}
-	ListNode(int x) : value(x), next(nullptr) {}
-	ListNode(int x, ListNode* nextnode) :value(x), next(nextnode) {}
-
-};
-struct TreeNode {
-	int val;
-	TreeNode* left;
-	TreeNode* right;
-	TreeNode() : val(0), left(nullptr), right(nullptr) {}
-	TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
-	TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
-};
+//struct ListNode {
+//	int value;
+//	ListNode* next;
+//
+//	//constructor:
+//	// : 构造函数初始化列表
+//	ListNode() : value(0), next(nullptr) {}
+//	ListNode(int x) : value(x), next(nullptr) {}
+//	ListNode(int x, ListNode* nextnode) :value(x), next(nextnode) {}
+//
+//};
+//struct TreeNode {
+//	int val;
+//	TreeNode* left;
+//	TreeNode* right;
+//	TreeNode() : val(0), left(nullptr), right(nullptr) {}
+//	TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+//	TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
+//};
 
 
 //88. merge_sorted_array
@@ -1475,6 +1475,607 @@ public:
 	}
 	
 };
+
+//202. happy number
+//https://leetcode.cn/problems/happy-number/
+
+class Solution_202
+{
+public:
+	bool isHappy(int n) {
+		unordered_set<int> used;
+		while (!used.count(n)) {
+			if (n == 1) return true;
+			used.insert(n);
+			int mark = 0;
+			while (n > 0) {
+				mark += pow(n % 10, 2);
+				n = n / 10;
+			}
+			n = mark;
+		}
+		return false;
+	}
+};
+
+//219. contains duplicate II
+//https://leetcode.cn/problems/contains-duplicate-ii/
+class Solution_219
+{
+	bool containsNearbyDuplicate(vector<int>& nums, int k) {
+		unordered_map<int, int> map;
+		for (int i = 0; i < nums.size(); ++i)
+		{
+			if (map.count(nums[i]) && i - map[nums[i]] < k) return true;
+			map[nums[i]] = i;
+		}
+		return false;
+	}
+};
+
+
+//128. longest consecutive sequence
+//https://leetcode.cn/problems/longest-consecutive-sequence/
+class Solution_128 
+{
+	int longestConsecutive(vector<int>& nums) {
+		unordered_set<int> num_set;
+		for (const int& num : nums)
+		{
+			num_set.insert(num);
+		}
+		int longestStreak = 0;
+		for (const int& num : num_set) {
+			if (!num_set.count(num - 1)) {
+				int currentNum = num;
+				int currentStreak = 1;
+				while (num_set.count(currentNum + 1)) {
+					currentNum += 1;
+					currentStreak += 1;
+				}
+				longestStreak = max(longestStreak, currentStreak);
+				
+			}
+		}
+		return longestStreak;
+	}
+	
+};
+
+
+//228. summary-ranges
+//https://leetcode.cn/problems/summary-ranges/
+class Solution_228
+{
+	vector<string> summaryRanges(vector<int>& nums) {
+		vector<string> ret;
+		int i = 0;
+		int n = nums.size();
+		while (i < n) {
+			int low = i;
+			++i;
+			
+			while (i < n && nums[i] == nums[i - 1] + 1) {
+				++i;
+			}
+
+			int high = i - 1;
+			string temp = to_string(nums[low]);
+			if (low < high) {
+				temp.append("->");
+				temp.append(to_string(nums[high]));
+			}
+			ret.push_back(move(temp));
+		}
+		return ret;
+	}
+};
+
+//56. merge intervals
+//https://leetcode.cn/problems/merge-intervals/description/
+class Solution_56 {
+	vector<vector<int>> merge(vector<vector<int>>& intervals) {
+		if (intervals.size() == 0) return {};
+		sort(intervals.begin(), intervals.end());
+		vector<vector<int>> merged;
+		for (int i = 0; i < intervals.size(); ++i) {
+			int L = intervals[i][0], R = intervals[i][1];
+			if (merged.size() == 0 || merged.back()[1] < L) {
+				merged.push_back({ L,R });
+			}
+			else {
+				merged.back()[1] = max(merged.back()[1], R);
+			}
+		}
+		return merged;
+	}
+};
+
+//57. insert interval
+//https://leetcode.cn/problems/insert-interval/
+class Solution_57{
+public:
+	vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+		vector<vector<int>> ans;
+		bool placed = false;
+		int left = newInterval[0], right = newInterval[1];
+
+		for (const vector<int>& a : intervals)
+		{
+			if (right < a[0])
+			{
+				if (!placed) {
+				ans.push_back({ left,right });
+				placed = true;
+				}
+				ans.push_back(a);
+			}
+			else if (left > a[1])
+			{
+				ans.push_back(a);
+			}
+			else {
+				left = min(left, a[0]);
+				right = max(right, a[1]);
+			}
+		}
+		if (!placed)
+		{
+			ans.push_back({ left,right });
+		}
+		return ans;
+	}
+};
+
+
+//452. minimum number of arrows to burst balloons
+//https://leetcode.cn/problems/minimum-number-of-arrows-to-burst-balloons/
+class Solution_452
+{
+public:
+	int findMinArrowShots(vector<vector<int>>& points) {
+		if (points.empty()) {
+			return 0;
+		}
+		sort(points.begin(), points.end(), [](const vector<int>& u, const vector<int>& v) {
+			return u[1] < v[1];
+		});
+		int pos = points[0][1];
+		int ans = 1;
+		for (const vector<int>& ballon : points) {
+			if (ballon[0] > pos) {
+				pos = ballon[1];
+				++ans;
+			}
+		}
+		return ans;
+	}
+};
+
+
+//20. valid-parentheses
+//https://leetcode.cn/problems/valid-parentheses/
+
+class Solution_20 {
+public:
+	bool isValid(string s) {
+		int n = s.size();
+		if (n % 2 == 1) return false;
+		
+		unordered_map<char, char> pairs = {
+			{')', '('},
+			{']','['},
+			{'}','{'},
+		};
+		stack<char> stk;
+		for (char ch : s) {
+			if (pairs.count(ch)) {
+				if (stk.empty() || stk.top() != pairs[ch]) {
+					return false;
+				}
+				stk.pop();
+			}
+			else {
+				stk.push(ch);
+			}
+		}
+		return stk.empty();
+	}
+};
+
+//150. evaluate reverse polish notation
+//https://leetcode.cn/problems/evaluate-reverse-polish-notation/
+
+class Solution_150 {
+public:
+	int evalRPN(vector<string>& tokens) {
+		stack<long long> stack;
+		for (int i = 0; i < tokens.size(); ++i) {
+			if (tokens[i] == "-" || tokens[i] == "+" || tokens[i] == "*" || tokens[i] == "/")
+			{
+				long long a = stack.top();
+				stack.pop();
+				long long b = stack.top();
+				stack.pop();
+				if (tokens[i] == "-") stack.push(b - a);
+				if (tokens[i] == "+") stack.push(b + a);
+				if (tokens[i] == "*") stack.push(b * a);
+				if (tokens[i] == "/") stack.push(b / a);
+			}
+			else {
+				stack.push(stoll(tokens[i]));
+			}
+		}
+		return stack.top();
+	}
+};
+
+class Solution_150_2 // switch case + enum
+{
+private:
+	enum class Operation {
+		NOOP,
+		ADD,
+		SUBTRACT,
+		MULTIPLY,
+		DIVIDE
+	};
+	Operation getOperation(const string& token) {
+		if (token == "+") return Operation::ADD;
+		if (token == "-") return Operation::SUBTRACT;
+		if (token == "*") return Operation::MULTIPLY;
+		if (token == "/") return Operation::DIVIDE;
+		return Operation::NOOP;
+	}
+
+public:
+
+	int evalRPN(vector<string>& tokens) {
+		stack<long long> stack;
+		
+		for (const string& token : tokens)
+		{
+			if (token == "-" || token == "+" || token == "*" || token == "/")
+			{
+				long long b = stack.top(); stack.pop();
+				long long a = stack.top(); stack.pop();
+				switch (getOperation(token)) {
+				case Operation::ADD:
+					stack.push(a + b);
+					break;
+				case Operation::SUBTRACT:
+					stack.push(a - b);
+					break;
+				case Operation::MULTIPLY:
+					stack.push(a * b);
+					break;
+				case Operation::DIVIDE:
+					stack.push(a / b);
+					break;
+				default:
+					break;
+				}
+			}
+			else {
+				stack.push(stoll(token));
+			}
+
+		}
+		return stack.top();
+	}
+};
+
+
+
+//141. linked-list-cycle
+//https://leetcode.cn/problems/linked-list-cycle/
+
+struct ListNode {
+	
+	int val;
+	ListNode* next;
+	//ListNode() :val(0), next(nullptr) {}
+	ListNode(int x) : val(x), next(nullptr) {}
+	ListNode(int x, ListNode* next) : val(x), next(next){}
+};
+
+class Solution_141 //快慢指针
+{
+public:
+	using LNp = ListNode*;
+	bool hasCycle(ListNode* head) {
+		LNp slow = head;
+		LNp fast = head;
+		
+		while (fast != nullptr)
+		{
+			fast = fast->next;
+			
+			if (fast != nullptr)
+			{
+				fast = fast->next;
+			}
+			if (fast == slow) return true;
+			slow = slow->next;
+		}
+		return false;
+	}
+	};
+
+class Solution_141_2 //哈希表
+{
+public:
+	bool hasCycle(ListNode* head) {
+		using LNp = ListNode*;
+		LNp cur = head;
+		unordered_set<LNp> marked;
+		while (cur != nullptr) {
+			if (!marked.count(cur))
+			{
+				marked.insert(cur);
+			}
+			else return true;
+			
+			cur = cur->next;
+		}
+		return false;
+	}
+};
+
+//2. add two numbers
+//https://leetcode.cn/problems/add-two-numbers/
+class Solution_2 //官解迭代
+{
+public:
+	using LNp = ListNode*;
+	using LN = ListNode;
+	LNp addTwoNumbers(LNp l1, LNp l2)
+	{
+		LNp head = nullptr, tail = nullptr;
+		int carry = 0;
+		
+		while (l1 || l2)
+		{
+			int n1 = l1 ? l1->val : 0;
+			int n2 = l2 ? l2->val : 0;
+			
+			int sum = n1 + n2 + carry;
+			
+			if (!head)
+			{
+				head = tail = new ListNode(sum % 10);
+			}
+			else
+			{
+				tail->next = new LN(sum % 10);
+				tail = tail->next;
+			}
+			carry = sum / 10;
+			
+			if (l1)
+			{
+				l1 = l1->next;
+			}
+			if (l2)
+			{
+				l2 = l2->next;
+			}
+			
+		}
+		if (carry > 0)
+		{
+			tail->next = new ListNode(carry);
+		}
+		return head;
+	}
+};
+
+
+class Solution_2_2//递归
+{
+public:
+	using LN = ListNode;
+	using LNp = ListNode*;
+	
+	ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+		return add(l1, l2, 0);
+	}
+	
+private:
+	LNp add(LNp l1, LNp l2, int carry)
+	{
+		if (!l1 && !l2 && carry == 0) return nullptr;
+		
+		int sum = (l1 ? l1->val : 0) + (l2 ? l2->val : 0) + carry;
+		
+		LNp node = new LN(sum % 10);
+		node->next = add(l1 ? l1->next : nullptr, l2 ? l2->next : nullptr, sum / 10);
+		return node;
+	}
+};
+
+
+//21. merge two sorted lists
+//https://leetcode.cn/problems/merge-two-sorted-lists/
+
+class Solution_21 //迭代
+{
+public:
+	using LN = ListNode;
+	using LNp = ListNode*;
+	
+	LNp mergeTwoLists(LNp l1, LNp l2) {
+		LNp dum = new LN(0);
+		LNp cur = dum;
+		while (l1 != nullptr && l2 != nullptr)
+		{
+			if (l1->val < l2->val) {
+				cur->next = l1;
+				l1 = l1->next;
+			}
+			else {
+				cur->next = l2;
+				l2 = l2->next;
+			}
+			cur = cur->next;
+		}
+		cur->next = l1 == nullptr ? l2 : l1;
+		return dum->next;
+	}
+};
+
+
+class Solution_21_2 //递归
+{
+public:
+	using LN = ListNode;
+	using LNp = LN*;
+	
+	LNp mergeTwoLists(LNp l1, LNp l2) {
+		if (l1 == nullptr) {
+			return l2;
+		}
+		else if(l2==nullptr){
+			return l1;
+		}
+		else if (l1->val < l2->val)
+		{
+			l1->next = mergeTwoLists(l1->next, l2);
+			return l1;
+		}
+		else {
+			l2->next = mergeTwoLists(l1, l2->next);
+			return l2;
+		}
+	}
+};
+
+//138. copy-list-with-random-pointer
+//https://leetcode-cn.com/problems/copy-list-with-random-pointer/
+class Node {
+public:
+	int val;
+	Node* next;
+	Node* random;
+
+	Node(int _val) {
+		val = _val;
+		next = nullptr;
+		random = nullptr;
+	}
+};
+
+
+class Solution_138 //回溯，哈希表
+{
+public:
+	using N = Node;
+	using Np = Node*;
+	unordered_map<Node*, Node*> cachedNode;
+	
+	Np copyRandomList(Np head) {
+		if (head == nullptr) {
+			return nullptr;
+		}
+		if (!cachedNode.count(head)) {
+			Np headNew = new N(head->val);
+			cachedNode[head] = headNew;
+			headNew->next = copyRandomList(head->next);
+			headNew->random = copyRandomList(head->random);
+		}
+		return cachedNode[head];
+	}
+	
+};
+
+
+class Solution_138_2 //迭代，拼接+拆分，三次遍历
+{
+public:
+	using N = Node;
+	using Np = Node*;
+
+	Np copyRandomList(Np head) {
+		if (head == nullptr) {
+			return nullptr;
+		}
+		for (Np node = head; node != nullptr; node = node->next->next) {
+			Np nodeNew = new Node(node->val);
+			nodeNew -> next = node -> next;
+			node->next = nodeNew;
+		}
+		for (Np node = head; node != nullptr; node = node->next->next) {
+			Np nodeNew = node->next;
+			nodeNew->random = (node->random != nullptr) ? node->random->next : nullptr;
+		}
+		Np headNew = head->next;
+		for (Np node = head; node != nullptr; node = node->next) {
+			Np nodeNew = node->next;
+			node->next = node->next->next;
+			nodeNew->next = (nodeNew->next != nullptr) ? nodeNew->next->next : nullptr;
+		}
+		return headNew;
+	}
+};
+
+//92. reverse-linked-list-ii
+//https://leetcode.cn/problems/reverse-linked-list-ii/solutions/634701/fan-zhuan-lian-biao-ii-by-leetcode-solut-teyq/
+
+class Solution_92
+{
+public:
+	using LNp = ListNode*;
+	using LN = ListNode;
+private:
+	void reverseLinkedList(ListNode* head) {
+		LNp pre = nullptr;
+		LNp cur = head;
+		while (cur != nullptr)
+		{
+			LNp next = cur->next;
+			cur->next = pre;
+			
+			pre = cur;
+			cur = next;
+		}
+	}
+
+public:
+	ListNode* reverseBetween(LNp head, int l, int r) {
+		LNp dum = new LN(-1);
+		dum->next = head;
+		
+		LNp pre = dum;
+		for (int i = 0; i < l - 1; ++i)
+		{
+			pre = pre->next;
+		}
+		LNp rn = pre;
+		for (int i = 0; i < r - l + 1; ++i) {
+			rn = rn->next;
+		}
+		
+		LNp leftnode = pre->next;
+		LNp cur = rn->next;
+
+		pre->next = nullptr;
+		rn->next = nullptr;
+		
+		reverseLinkedList(leftnode);
+		
+		pre->next = rn;
+		leftnode->next = cur;
+		return dum->next;
+	}
+
+};
+
+
+//
+
+
+
+
 
 
 ////Solution_12
