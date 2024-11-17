@@ -195,9 +195,78 @@ public:
 				if (differ.empty()) {
 					res.emplace_back(start);
 				}
-
 			}
 		}
 		return res;
+	}
+};
+
+
+//20. valid-parentheses
+//https://leetcode.cn/problems/valid-parentheses/
+
+class Solution  //Õ»
+{
+public:
+	bool isValid(string s) {
+		int n = s.size();
+		if (n % 2 == 1) return false;
+
+		unordered_map<char, char> pairs = {
+			{')', '('},
+			{']','['},
+			{'}','{'},
+		};
+		stack<char> stk;
+		for (char ch : s) {
+			if (pairs.count(ch)) {
+				if (stk.empty() || stk.top() != pairs[ch]) {
+					return false;
+				}
+				stk.pop();
+			}
+			else {
+				stk.push(ch);
+			}
+		}
+		return stk.empty();
+	}
+};
+
+
+//21. merge-two-sorted-lists
+//https://leetcode-cn.com/problems/merge-two-sorted-lists/
+
+struct ListNode {
+	int val;
+	ListNode* next;
+
+	//ListNode() : val(0), next(nullptr) {}
+	ListNode(int x) : val(x), next(nullptr) {}
+	ListNode(int x, ListNode* next) : val(x), next(next) {}
+};
+
+class Solution_21_2 //µÝ¹é
+{
+public:
+	using LN = ListNode;
+	using LNp = LN*;
+
+	LNp mergeTwoLists(LNp l1, LNp l2) {
+		if (l1 == nullptr) {
+			return l2;
+		}
+		else if (l2 == nullptr) {
+			return l1;
+		}
+		else if (l1->val < l2->val)
+		{
+			l1->next = mergeTwoLists(l1->next, l2);
+			return l1;
+		}
+		else {
+			l2->next = mergeTwoLists(l1, l2->next);
+			return l2;
+		}
 	}
 };
