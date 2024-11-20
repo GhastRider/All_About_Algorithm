@@ -270,3 +270,79 @@ public:
 		}
 	}
 };
+
+
+
+//25. reverse-nodes-in-k-group
+//https://leetcode.cn/problems/reverse-nodes-in-k-group/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+
+class Solution_25 {
+public:
+	using LN = ListNode;
+
+private:
+	pair<LN*, LN*> reverseList(LN* head, LN* tail)
+	{
+		LN* cur = head;
+		LN* pre = tail->next;
+		// LN* next = head->next;
+
+		while (pre != tail)
+		{
+			LN* next = cur->next;
+			cur->next = pre;
+
+			pre = cur;
+			cur = next;
+		}
+		return { tail, head };
+	}
+
+public:
+	LN* reverseKGroup(LN* head, int k)
+	{
+		LN* hair = new LN(0);
+		hair->next = head;
+		LN* pre = hair;
+
+		while (head)
+		{
+			LN* tail = pre;
+
+			for (int i = 0; i < k; ++i)
+			{
+				tail = tail->next;
+				if (!tail) {
+					return hair->next;
+				}
+			}
+			LN* nex = tail->next;
+
+			pair<LN*, LN*> res = reverseList(head, tail);
+
+			head = res.first;
+			tail = res.second;
+
+			pre->next = head;
+			tail->next = nex;
+			pre = tail;
+
+			head = tail->next;
+
+		}
+
+		return hair->next;
+	}
+
+};

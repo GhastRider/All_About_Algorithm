@@ -2071,7 +2071,232 @@ public:
 };
 
 
-//
+//25. reverse-nodes-in-k-group
+//https://leetcode.cn/problems/reverse-nodes-in-k-group/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+
+class Solution_25 {
+public:
+	using LN = ListNode;
+
+private:
+	pair<LN*, LN*> reverseList(LN* head, LN* tail)
+	{
+		LN* cur = head;
+		LN* pre = tail->next;
+		// LN* next = head->next;
+
+		while (pre != tail)
+		{
+			LN* next = cur->next;
+			cur->next = pre;
+
+			pre = cur;
+			cur = next;
+		}
+		return { tail, head };
+	}
+
+public:
+	LN* reverseKGroup(LN* head, int k)
+	{
+		LN* hair = new LN(0);
+		hair->next = head;
+		LN* pre = hair;
+
+		while (head)
+		{
+			LN* tail = pre;
+
+			for (int i = 0; i < k; ++i)
+			{
+				tail = tail->next;
+				if (!tail) {
+					return hair->next;
+				}
+			}
+			LN* nex = tail->next;
+
+			pair<LN*, LN*> res = reverseList(head, tail);
+
+			head = res.first;
+			tail = res.second;
+
+			pre->next = head;
+			tail->next = nex;
+			pre = tail;
+
+			head = tail->next;
+
+		}
+
+		return hair->next;
+	}
+
+};
+
+
+
+//19. remove-nth-node-from-end-of-list
+//https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/
+class Solution_19
+{
+public:
+using LN = ListNode;
+ListNode* removeNthFromEnd(ListNode* head, int n) {
+
+	LN* null_meeter = head;
+	LN* pre = new LN(-1);
+	LN* res = pre;
+	pre->next = null_meeter;
+
+	for (int i = 0; i < n; ++i)
+	{
+		null_meeter = null_meeter->next;
+
+	}
+	while (null_meeter != nullptr) {
+		null_meeter = null_meeter->next;
+		pre = pre->next;
+	}
+	pre->next = pre->next->next;
+	//return check_n == n ? head->next : head;
+	return res->next;
+	}
+};
+
+
+//82. remove-duplicates-from-sorted-list-ii
+//https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+
+class Solution_82 {
+public:
+	using LN = ListNode;
+	ListNode* deleteDuplicates(ListNode* head) {
+		if (head == nullptr) return head;
+		LN* hair = new LN(-1, head);
+		LN* pre = hair;
+		LN* cur = head;
+		int mark = 1 - INT_MAX;
+		while (cur && cur->next) {
+			if (cur->val == cur->next->val)
+			{
+				mark = cur->val;
+				while (cur && cur->val == mark)
+				{
+					cur = cur->next;
+				}
+				pre->next = cur;
+				continue;
+			}
+			cur = cur->next;
+			pre = pre->next;
+		}
+		return (*hair).next;
+	}
+};
+
+//61. rotate-list
+//https://leetcode-cn.com/problems/rotate-list/
+class Solution_61 //k取模，循环k次操作
+{
+public:
+	using LN = ListNode;
+	ListNode* rotateRight(ListNode* head, int k) {
+		if (head == nullptr || head->next == nullptr || k == 0) return head;
+		LN* cur_head = head;
+
+		int count = 0;
+		LN* counter = head;
+		while (counter)
+		{
+			counter = counter->next;
+			++count;
+		}
+		k = k % count;
+
+		for (int i = 0; i < k; ++i)
+		{
+			LN* cur = cur_head;
+			LN* preOfEnd;
+			while (cur->next)
+			{
+
+				if (cur->next->next == nullptr)
+				{
+					preOfEnd = cur;
+				}
+				cur = cur->next;
+
+			}
+			cur->next = cur_head;
+			preOfEnd->next = nullptr;
+
+			cur_head = cur;
+		}
+		return cur_head;
+	}
+};
+
+class Solution_61_2
+{
+public:
+	using LN = ListNode;
+	ListNode* rotateRight(ListNode* head, int k) {
+		if (head == nullptr || head->next == nullptr || k == 0) return head;
+		LN* cur_head = head;
+
+		int count = 0;
+		LN* counter = head;
+		LN* originEnd;
+
+		while (counter)
+		{
+			if (counter->next == nullptr)
+			{
+				originEnd = counter;
+			}
+			counter = counter->next;
+			++count;
+		}
+		k = k % count; if (k == 0)return head;
+
+		int newEnd = count - k - 1;
+		LN* newEndNode = head;
+		for (int i = 0; i < newEnd; ++i)
+		{
+			newEndNode = newEndNode->next;
+		}
+		LN* newHead = newEndNode->next;
+		newEndNode->next = nullptr;
+		originEnd->next = head;
+		return newHead;
+	}
+};
+
+
+
 
 
 
