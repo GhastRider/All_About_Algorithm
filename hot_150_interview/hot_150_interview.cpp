@@ -2071,7 +2071,486 @@ public:
 };
 
 
+//25. reverse-nodes-in-k-group
+//https://leetcode.cn/problems/reverse-nodes-in-k-group/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+
+class Solution_25 {
+public:
+	using LN = ListNode;
+
+private:
+	pair<LN*, LN*> reverseList(LN* head, LN* tail)
+	{
+		LN* cur = head;
+		LN* pre = tail->next;
+		// LN* next = head->next;
+
+		while (pre != tail)
+		{
+			LN* next = cur->next;
+			cur->next = pre;
+
+			pre = cur;
+			cur = next;
+		}
+		return { tail, head };
+	}
+
+public:
+	LN* reverseKGroup(LN* head, int k)
+	{
+		LN* hair = new LN(0);
+		hair->next = head;
+		LN* pre = hair;
+
+		while (head)
+		{
+			LN* tail = pre;
+
+			for (int i = 0; i < k; ++i)
+			{
+				tail = tail->next;
+				if (!tail) {
+					return hair->next;
+				}
+			}
+			LN* nex = tail->next;
+
+			pair<LN*, LN*> res = reverseList(head, tail);
+
+			head = res.first;
+			tail = res.second;
+
+			pre->next = head;
+			tail->next = nex;
+			pre = tail;
+
+			head = tail->next;
+
+		}
+
+		return hair->next;
+	}
+
+};
+
+
+
+//19. remove-nth-node-from-end-of-list
+//https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/
+class Solution_19
+{
+public:
+using LN = ListNode;
+ListNode* removeNthFromEnd(ListNode* head, int n) {
+
+	LN* null_meeter = head;
+	LN* pre = new LN(-1);
+	LN* res = pre;
+	pre->next = null_meeter;
+
+	for (int i = 0; i < n; ++i)
+	{
+		null_meeter = null_meeter->next;
+
+	}
+	while (null_meeter != nullptr) {
+		null_meeter = null_meeter->next;
+		pre = pre->next;
+	}
+	pre->next = pre->next->next;
+	//return check_n == n ? head->next : head;
+	return res->next;
+	}
+};
+
+
+//82. remove-duplicates-from-sorted-list-ii
+//https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii/
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+
+class Solution_82 {
+public:
+	using LN = ListNode;
+	ListNode* deleteDuplicates(ListNode* head) {
+		if (head == nullptr) return head;
+		LN* hair = new LN(-1, head);
+		LN* pre = hair;
+		LN* cur = head;
+		int mark = 1 - INT_MAX;
+		while (cur && cur->next) {
+			if (cur->val == cur->next->val)
+			{
+				mark = cur->val;
+				while (cur && cur->val == mark)
+				{
+					cur = cur->next;
+				}
+				pre->next = cur;
+				continue;
+			}
+			cur = cur->next;
+			pre = pre->next;
+		}
+		return (*hair).next;
+	}
+};
+
+//61. rotate-list
+//https://leetcode-cn.com/problems/rotate-list/
+class Solution_61 //k取模，循环k次操作
+{
+public:
+	using LN = ListNode;
+	ListNode* rotateRight(ListNode* head, int k) {
+		if (head == nullptr || head->next == nullptr || k == 0) return head;
+		LN* cur_head = head;
+
+		int count = 0;
+		LN* counter = head;
+		while (counter)
+		{
+			counter = counter->next;
+			++count;
+		}
+		k = k % count;
+
+		for (int i = 0; i < k; ++i)
+		{
+			LN* cur = cur_head;
+			LN* preOfEnd;
+			while (cur->next)
+			{
+
+				if (cur->next->next == nullptr)
+				{
+					preOfEnd = cur;
+				}
+				cur = cur->next;
+
+			}
+			cur->next = cur_head;
+			preOfEnd->next = nullptr;
+
+			cur_head = cur;
+		}
+		return cur_head;
+	}
+};
+
+class Solution_61_2
+{
+public:
+	using LN = ListNode;
+	ListNode* rotateRight(ListNode* head, int k) {
+		if (head == nullptr || head->next == nullptr || k == 0) return head;
+		LN* cur_head = head;
+
+		int count = 0;
+		LN* counter = head;
+		LN* originEnd;
+
+		while (counter)
+		{
+			if (counter->next == nullptr)
+			{
+				originEnd = counter;
+			}
+			counter = counter->next;
+			++count;
+		}
+		k = k % count; if (k == 0)return head;
+
+		int newEnd = count - k - 1;
+		LN* newEndNode = head;
+		for (int i = 0; i < newEnd; ++i)
+		{
+			newEndNode = newEndNode->next;
+		}
+		LN* newHead = newEndNode->next;
+		newEndNode->next = nullptr;
+		originEnd->next = head;
+		return newHead;
+	}
+};
+
+
+
+//86. partition-list
 //
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution_86 {
+public:
+	using LN = ListNode;
+	ListNode* partition(ListNode* head, int x) {
+		LN* small = new LN(0);
+		LN* smallHead = small;
+		LN* large = new LN(0);
+		LN* largeHead = large;
+
+		while (head != nullptr)
+		{
+			if (head->val < x)
+			{
+				small->next = head;
+				small = small->next;
+			}
+			else {
+				large->next = head;
+				large = large->next;
+			}
+			head = head->next;
+		}
+		large->next = nullptr;
+		small->next = largeHead->next;
+		return smallHead->next;
+	}
+};
+
+
+// Tree TreeNode structure
+// TreeNode
+struct TreeNode {
+	int val;
+	TreeNode* left;
+	TreeNode* right;
+	TreeNode() :val(0), left(nullptr), right(nullptr) {}
+	TreeNode(int x) :val(x), left(nullptr), right(nullptr) {}
+	TreeNode(int x, TreeNode* left, TreeNode* right) :val(x), left(left), right(right) {}
+};
+
+//226. invert binary tree
+//https://leetcode.cn/problems/invert-binary-tree/
+class Solution_226 
+{
+public:
+	using TN = TreeNode;
+	TN* invertTree(TN* root)
+	{
+		if (root == nullptr) return root;
+		TN* temp = root->left;
+		root->left = invertTree(root->right);
+		root->right = invertTree(temp);
+		return root;
+	}
+};
+
+//105. construct-binary-tree-from-preorder-and-inorder-traversal
+//https://leetcode.cn/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
+class Solution_105 {
+public:
+	TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+		if (preorder.empty()) { return nullptr; }
+
+		// int left_size = ranges::find(inorder, preorder[0]) - inorder.begin();
+		int left_size = find(inorder.begin(), inorder.end(), preorder[0]) - inorder.begin();
+
+		vector<int> pre1(preorder.begin() + 1, preorder.begin() + 1 + left_size);
+		vector<int> pre2(preorder.begin() + 1 + left_size, preorder.end());
+		vector<int> in1(inorder.begin(), inorder.begin() + left_size);
+		vector<int> in2(inorder.begin() + 1 + left_size, inorder.end());
+
+		TreeNode* left = buildTree(pre1, in1);
+		TreeNode* right = buildTree(pre2, in2);
+		return new TreeNode(preorder[0], left, right);
+	}
+};
+
+
+//106. construct-binary-tree-from-inorder-and-postorder-traversal
+//https://leetcode.cn/problems/construct-binary-tree-from-inorder-and-postorder-traversal/
+
+class Solution_106 {
+public:
+	TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+		if (postorder.empty())
+		{
+			return nullptr;
+		}
+		//int left_size = ranges::find(inorder, *(postorder.end() - 1)) - inorder.begin();
+		int left_size = find(inorder.begin(), inorder.end(), postorder.back()) - inorder.begin();
+		vector<int> in1(inorder.begin(), inorder.begin() + left_size);
+		vector<int> in2(inorder.begin() + left_size + 1, inorder.end());
+		vector<int> post1(postorder.begin(), postorder.begin() + left_size);
+		vector<int> post2(postorder.begin() + left_size, postorder.end() - 1);
+
+		TreeNode* left = buildTree(in1, post1);
+		TreeNode* right = buildTree(in2, post2);
+
+
+		return new TreeNode(*(postorder.end() - 1), left, right);
+	}
+};
+
+//114. flatten-binary-tree-to-linked-list
+// https://leetcode-cn.com/problems/flatten-binary-tree-to-linked-list/
+
+class Solution_114 {
+	using TN = TreeNode;
+private:
+	TN* head = nullptr;
+	
+public:
+	void flatten(TN* root) {
+		if (root == nullptr) return;
+		flatten(root->right);
+		flatten(root->left);
+		
+		root->left = nullptr;
+		root->right = head;
+		head = root;
+	
+	}
+};
+
+
+//112. path-sum
+//https://leetcode.cn/problems/path-sum/
+
+class Solution_112 {
+public:
+	bool hasPathSum(TreeNode* root, int sum) {
+		if (root == nullptr) return false;
+		if (root->left == nullptr && root->right == nullptr) { return sum == root->val; }
+		return hasPathSum(root->left, sum - root->val) || hasPathSum(root->right, sum - root->val);
+	}
+};
+
+
+//129. sum-root-to-leaf-numbers
+//https://leetcode-cn.com/problems/sum-root-to-leaf-numbers/
+class Solution_129 //DFS 无返回值
+{
+	int ans = 0;
+public:
+	int sumNumbers(TreeNode* root) {
+		dfs(root, 0);
+		return ans;
+	}
+private:
+	void dfs(TreeNode* root, int cursum)
+	{
+		if (root == nullptr) return;
+		if (root->right == nullptr && root->left == nullptr)
+		{
+			ans += (cursum + root->val);
+			return;
+		}
+		dfs(root->right, (cursum + root->val) * 10);
+		dfs(root->left, (cursum + root->val) * 10);
+	}
+};
+
+class Solution_129_2 //DFS 有返回值
+{
+public:
+	int sumNumbers(TreeNode* root) {
+		return dfs(root, 0);
+	}
+private:
+	int dfs(TreeNode* root, int cursum)
+	{
+		if (root == nullptr) return 0;
+		if (root->right == nullptr && root->left == nullptr)
+		{
+			return cursum + root->val;
+		}
+		return dfs(root->right, (cursum + root->val) * 10) + dfs(root->left, (cursum + root->val) * 10);
+	}
+};
+
+
+
+//124. binary-tree-maximum-path-sum
+//https://leetcode-cn.com/problems/binary-tree-maximum-path-sum/
+
+class Solution {
+public:
+
+	int maxPathSum(TreeNode* root) {
+		int ans = INT_MIN;
+		dfs(root, ans);
+		return ans;
+	}
+private:
+	int dfs(TreeNode* node, int& ans) {
+		if (node == nullptr) { return 0; }
+		int l_val = dfs(node->left, ans);
+		int r_val = dfs(node->right, ans);
+		ans = max(ans, l_val + r_val + node->val);
+		return max(max(l_val, r_val) + node->val, 0);
+	}
+};
+
+//222. 完全二叉树的节点个数
+//https://leetcode-cn.com/problems/count-complete-tree-nodes/
+
+
+class Solution_222 {
+	int countNodes(TreeNode* root) {
+		if (root == nullptr) return 0;
+		return countNodes(root->right) + countNodes(root->left) + 1;
+	}
+};
+
+class Solution_222_2 {
+public:
+	int countNodes(TreeNode* root) {
+		if (root == nullptr) return 0;
+		
+		int pos = 0;
+		queue<TreeNode*> q;
+		TreeNode* p;
+
+		q.push(root);
+
+		while (!q.empty())
+		{
+			p = q.front();q.pop();
+			pos++;
+			if (!p->left && !p->right) {
+				return pos * 2 - 1;
+			}
+			else if (p->left && !p->right) {
+				return pos * 2;
+			}
+			q.push(p->left);
+			q.push(p->right);
+		}
+		return 0;
+	}
+};
 
 
 
