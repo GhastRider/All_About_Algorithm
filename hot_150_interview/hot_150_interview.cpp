@@ -2430,7 +2430,6 @@ public:
 		root->left = nullptr;
 		root->right = head;
 		head = root;
-	
 	}
 };
 
@@ -2655,6 +2654,331 @@ public:
 		return ans;
 	}
 };
+
+
+
+//103. binary-tree-zigzag-level-order-traversal
+//https://leetcode.cn/problems/binary-tree-zigzag-level-order-traversal/
+class Solution_103
+{
+public:
+	vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+		vector<vector<int>> res;
+		if (root == nullptr) return res;
+
+		queue<TreeNode*> q;
+		q.push(root);
+		TreeNode* p;
+		int flag = 1;
+		while (!q.empty())
+		{
+			int len = q.size();
+			vector<int> ans;
+			for (int i = 0; i < len; ++i)
+			{
+				p = q.front(); q.pop();
+				if (p->left) q.push(p->left);
+				if (p->right) q.push(p->right);
+				ans.push_back(p->val);
+			}
+			if (flag == -1)
+				reverse(ans.begin(), ans.end());
+			res.emplace_back(ans);
+			flag = -flag;
+		}
+		return res;
+	}
+};
+
+
+
+//530. minimum-absolute-difference-in-bst
+//https://leetcode.cn/problems/minimum-absolute-difference-in-bst/
+
+class Solution_530
+{
+private:
+
+	int res = INT_MAX;
+	TreeNode* pre = nullptr;
+	void dfs(TreeNode* cur)
+	{
+		if (cur == nullptr) return;
+
+		dfs(cur->left);
+		if (pre != nullptr) res = min(res, cur->val - pre->val);
+		pre = cur;
+		dfs(cur->right);
+	}
+public:
+	int getMinimumDifference(TreeNode* root) {
+		dfs(root);
+		return res;
+
+	}
+};
+
+class Solution_530_2
+{
+private:
+	vector<int> vec;
+	void dfs(TreeNode* root)
+	{
+		if (root == nullptr) return;
+
+		dfs(root->left);
+		vec.emplace_back(root->val);
+		dfs(root->right);
+	}
+public:
+	int getMinimumDifference(TreeNode* root) {
+		vec.clear();
+		dfs(root);
+		if (vec.size() < 2) return 0;
+		int result = INT_MAX;
+
+		for (size_t i = 1; i < vec.size(); ++i)
+		{
+			result = min(result, vec[i] - vec[i - 1]);
+		}
+		return result;
+	}
+};
+
+//230. kth-smallest-element-in-a-bst
+//https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst/
+
+class Solution_230
+{
+private:
+	int counter = 1;
+	TreeNode* pre;
+	int flag = 0;
+	int ans;
+	void dfs(TreeNode* cur, int k)
+	{
+		if (cur == nullptr || flag == 1)
+			return;
+		dfs(cur->left, k);
+		if (cur != nullptr)
+		{
+			if (counter == k) { flag = 1; ans = cur->val; }
+			counter++;
+		}
+		dfs(cur->right, k);
+	}
+
+public:
+	int kthSmallest(TreeNode* root, int k) {
+		ans = root->val;
+		dfs(root, k);
+		return ans;
+	}
+
+};
+
+class Solution_230_2
+{
+public:
+	int kthSmallest(TreeNode* root, int k) {
+		auto dfs = [&](auto&& dfs, TreeNode* node)->int {
+			if (node == nullptr)
+				return -1;
+			int left_res = dfs(dfs, node->left);
+			if (left_res != -1) return left_res;
+			if (--k == 0) return node->val;
+			return dfs(dfs, node->right);
+			};
+		return dfs(dfs, root);
+	}
+};
+
+//98. validate-binary-search-tree
+//https://leetcode-cn.com/problems/validate-binary-search-tree/
+class Solution_98 //中序遍历：顺序检查相邻节点大小关系
+{
+public:
+	TreeNode* pre = nullptr;
+	bool isValidBST(TreeNode* root) {
+		if (root == nullptr) return true;
+
+		if (!isValidBST(root->left)) return false;
+		if (pre != nullptr) { if (pre->val >= root->val) return false; }
+		pre = root;
+		if (!isValidBST(root->right)) return false;
+
+		return true;
+	}
+};
+
+//108. convert-sorted-array-to-binary-search-tree
+//https://leetcode-cn.com/problems/convert-sorted-array-to-binary-search-tree/
+
+class Solution_108 {
+private:
+	TreeNode* dfs(vector<int>& nums, int left, int right)
+	{
+		if (left == right) return nullptr;
+		int m = left + (right - left) / 2;
+		return new TreeNode(nums[m], dfs(nums, left, m), dfs(nums, m + 1, right));
+	}
+
+public:
+	TreeNode* sortedArrayToBST(vector<int>& nums) {
+		return dfs(nums, 0, nums.size());
+	}
+};
+
+//23. merge-k-sorted-lists
+//https://leetcode-cn.com/problems/merge-k-sorted-lists/
+
+
+class Solution_23 {
+	using LN = ListNode;
+public:
+	ListNode* mergeKLists(vector<ListNode*>& lists) {
+
+		auto mycompare = [](const LN* a, const LN* b) {return a->val > b->val; };
+		priority_queue<LN*, vector<LN*>, decltype(mycompare)> pq;
+		for (auto head : lists)
+		{
+			if (head)//记得，这里来给输入判空
+				pq.push(head);
+		}
+		LN* dum = new LN(-1);
+		LN* cur = dum;
+		while (!pq.empty())
+		{
+			auto p = pq.top(); pq.pop();
+			if (p->next) pq.push(p->next);
+			cur->next = p;
+			cur = cur->next;
+		}
+		return dum->next;
+	}
+};
+
+
+//53. maximum-subarray
+//https://leetcode.cn/problems/maximum-subarray
+class Solution_53 //前缀和
+{
+	int ans =INT_MIN;
+	int min_presum = 0;
+	int presum = 0;
+	for (int x : nums)
+	{
+		presum += x;
+		ans = max(ans, presum - min_presum);
+		min_presum = min(min_presum, presum);
+	}
+	return ans;
+
+};
+
+class Solution_53_2//DP
+{
+public:
+	int maxSubArray(vector<int>& nums) {
+		vector<int> f(nums.size());
+		f[0] = nums[0];
+		int ans = f[0];
+		for (int i = 1; i < nums.size(); ++i)
+		{
+
+			f[i] = max(f[i - 1], 0) + nums[i];
+			ans = max(ans, f[i]);
+		}
+		return ans;
+	}
+};
+
+class Solution_53_2_1//DP 用max_element或者ranges::max()
+{
+public:
+	int maxSubArray(vector<int>& nums) {
+		vector<int> f(nums.size());
+		f[0] = nums[0];
+		for (int i = 1; i < nums.size(); ++i)
+		{
+			f[i] = max(f[i - 1], 0) + nums[i];
+		}
+		return *max_element(f.begin(), f.end());
+		//return ranges::max(f);
+	}
+};
+
+
+
+//918. maximum-sum-circular-subarray
+//https://leetcode.cn/problems/maximum-sum-circular-subarray/
+class Solution_918 {
+public:
+	int maxSubarraySumCircular(vector<int>& nums) {
+		int max_s = INT_MIN;
+		int min_s = INT_MAX;
+		
+		int max_f = 0, min_f = 0;
+		int sum = 0;
+		
+		for (int x : nums)
+		{
+			sum += x;
+			max_f = max(max_f, 0) + x;
+			max_s = max(max_s, max_f);
+
+			min_f = min(min_f, 0) + x;
+			min_s = min(min_s, min_f);
+		}
+		return min_s == sum ? max_s : max(max_s, sum - min_s);
+
+	}
+};
+
+//35. search-insert-position
+//https://leetcode.cn/problems/search-insert-position/
+class Solution_35
+{
+public:
+	int searchInsert(vector<int>& nums, int target) {
+		int l = 0, r = nums.size();
+		while (l < r)
+		{
+			int mid = ((r - l) >> 1) + l;
+			if (target <= nums[mid]) r = mid;
+			else l = mid + 1;
+		}
+		return r;
+	}
+};
+
+//74. search-a-2d-matrix
+//https://leetcode-cn.com/problems/search-a-2d-matrix/
+
+class Solution_74 {
+public:
+	bool searchMatrix(vector<vector<int>>& matrix, int target) {
+		int m = matrix.size(), n = matrix[0].size();
+		int left = 0, right = m * n - 1;
+		while (left < right) {
+			int mid = ((right - left) >> 1) + left;
+			int x = matrix[mid / n][mid % n];
+			if (target <= x)
+			{
+				right = mid;
+			}
+			else
+			{
+				left = mid + 1;
+			}
+		}
+		if (matrix[right / n][right % n] == target)
+			return true;
+		return false;
+	}
+};
+
+
 
 
 
