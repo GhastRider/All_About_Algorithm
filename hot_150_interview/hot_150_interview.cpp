@@ -2430,7 +2430,6 @@ public:
 		root->left = nullptr;
 		root->right = head;
 		head = root;
-	
 	}
 };
 
@@ -2655,6 +2654,183 @@ public:
 		return ans;
 	}
 };
+
+
+
+//103. binary-tree-zigzag-level-order-traversal
+//https://leetcode.cn/problems/binary-tree-zigzag-level-order-traversal/
+class Solution_103
+{
+public:
+	vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+		vector<vector<int>> res;
+		if (root == nullptr) return res;
+
+		queue<TreeNode*> q;
+		q.push(root);
+		TreeNode* p;
+		int flag = 1;
+		while (!q.empty())
+		{
+			int len = q.size();
+			vector<int> ans;
+			for (int i = 0; i < len; ++i)
+			{
+				p = q.front(); q.pop();
+				if (p->left) q.push(p->left);
+				if (p->right) q.push(p->right);
+				ans.push_back(p->val);
+			}
+			if (flag == -1)
+				reverse(ans.begin(), ans.end());
+			res.emplace_back(ans);
+			flag = -flag;
+		}
+		return res;
+	}
+};
+
+
+
+//530. minimum-absolute-difference-in-bst
+//https://leetcode.cn/problems/minimum-absolute-difference-in-bst/
+
+class Solution_530
+{
+private:
+
+	int res = INT_MAX;
+	TreeNode* pre = nullptr;
+	void dfs(TreeNode* cur)
+	{
+		if (cur == nullptr) return;
+
+		dfs(cur->left);
+		if (pre != nullptr) res = min(res, cur->val - pre->val);
+		pre = cur;
+		dfs(cur->right);
+	}
+public:
+	int getMinimumDifference(TreeNode* root) {
+		dfs(root);
+		return res;
+
+	}
+};
+
+class Solution_530_2
+{
+private:
+	vector<int> vec;
+	void dfs(TreeNode* root)
+	{
+		if (root == nullptr) return;
+
+		dfs(root->left);
+		vec.emplace_back(root->val);
+		dfs(root->right);
+	}
+public:
+	int getMinimumDifference(TreeNode* root) {
+		vec.clear();
+		dfs(root);
+		if (vec.size() < 2) return 0;
+		int result = INT_MAX;
+
+		for (size_t i = 1; i < vec.size(); ++i)
+		{
+			result = min(result, vec[i] - vec[i - 1]);
+		}
+		return result;
+	}
+};
+
+//230. kth-smallest-element-in-a-bst
+//https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst/
+
+class Solution_230
+{
+private:
+	int counter = 1;
+	TreeNode* pre;
+	int flag = 0;
+	int ans;
+	void dfs(TreeNode* cur, int k)
+	{
+		if (cur == nullptr || flag == 1)
+			return;
+		dfs(cur->left, k);
+		if (cur != nullptr)
+		{
+			if (counter == k) { flag = 1; ans = cur->val; }
+			counter++;
+		}
+		dfs(cur->right, k);
+	}
+
+public:
+	int kthSmallest(TreeNode* root, int k) {
+		ans = root->val;
+		dfs(root, k);
+		return ans;
+	}
+
+};
+
+class Solution_230_2
+{
+public:
+	int kthSmallest(TreeNode* root, int k) {
+		auto dfs = [&](auto&& dfs, TreeNode* node)->int {
+			if (node == nullptr)
+				return -1;
+			int left_res = dfs(dfs, node->left);
+			if (left_res != -1) return left_res;
+			if (--k == 0) return node->val;
+			return dfs(dfs, node->right);
+			};
+		return dfs(dfs, root);
+	}
+};
+
+//98. validate-binary-search-tree
+//https://leetcode-cn.com/problems/validate-binary-search-tree/
+class Solution_98 //中序遍历：顺序检查相邻节点大小关系
+{
+public:
+	TreeNode* pre = nullptr;
+	bool isValidBST(TreeNode* root) {
+		if (root == nullptr) return true;
+
+		if (!isValidBST(root->left)) return false;
+		if (pre != nullptr) { if (pre->val >= root->val) return false; }
+		pre = root;
+		if (!isValidBST(root->right)) return false;
+
+		return true;
+	}
+};
+
+//108. convert-sorted-array-to-binary-search-tree
+//https://leetcode-cn.com/problems/convert-sorted-array-to-binary-search-tree/
+
+class Solution_108 {
+private:
+	TreeNode* dfs(vector<int>& nums, int left, int right)
+	{
+		if (left == right) return nullptr;
+		int m = left + (right - left) / 2;
+		return new TreeNode(nums[m], dfs(nums, left, m), dfs(nums, m + 1, right));
+	}
+
+public:
+	TreeNode* sortedArrayToBST(vector<int>& nums) {
+		return dfs(nums, 0, nums.size());
+	}
+};
+
+//23. merge-k-sorted-lists
+//https://leetcode-cn.com/problems/merge-k-sorted-lists/
 
 
 
