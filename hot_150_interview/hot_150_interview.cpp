@@ -2524,35 +2524,141 @@ class Solution_222 {
 	}
 };
 
-class Solution_222_2 {
+//class Solution_222_2 {
+//public:
+//	int countNodes(TreeNode* root) {
+//		if (root == nullptr) return 0;
+//		
+//		int pos = 0;
+//		queue<TreeNode*> q;
+//		TreeNode* p;
+//
+//		q.push(root);
+//
+//		while (!q.empty())
+//		{
+//			p = q.front();q.pop();
+//			pos++;
+//			if (!p->left && !p->right) {
+//				return pos * 2 - 1;
+//			}
+//			else if (p->left && !p->right) {
+//				return pos * 2;
+//			}
+//			q.push(p->left);
+//			q.push(p->right);
+//		}
+//		return 0;
+//	}
+//};
+
+
+//236. 二叉树的最近公共祖先
+//https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/
+class Solution_236
+{
+	using TN = TreeNode;
+	TN* lowestCommonAncestor(TN* root, TN* p, TN* q)
+	{
+		if (root == nullptr || root == p || root == q)
+		{
+			return root;
+		}
+		TN* left = lowestCommonAncestor(root->left, p, q);
+		TN* right = lowestCommonAncestor(root->right, p, q);
+		if (left && right) return root;
+		return left ? left : right;
+	}
+};
+
+//199. binary-tree-right-side-view
+//https://leetcode.cn/problems/binary-tree-right-side-view/
+class Solution_199
+{
 public:
-	int countNodes(TreeNode* root) {
-		if (root == nullptr) return 0;
-		
-		int pos = 0;
+	vector<int> rightSideView(TreeNode* root) {
+		vector<int> ans;
+		if (root == nullptr)
+			return ans;
 		queue<TreeNode*> q;
 		TreeNode* p;
-
 		q.push(root);
 
 		while (!q.empty())
 		{
-			p = q.front();q.pop();
-			pos++;
-			if (!p->left && !p->right) {
-				return pos * 2 - 1;
+			int len = q.size();
+			for (size_t i = 0; i < len; ++i)
+			{
+				p = q.front(); q.pop();
+				if (i == len - 1)
+					ans.push_back(p->val);
+				if (p->left) q.push(p->left);
+				if (p->right) q.push(p->right);
 			}
-			else if (p->left && !p->right) {
-				return pos * 2;
-			}
-			q.push(p->left);
-			q.push(p->right);
 		}
-		return 0;
+		return ans;
 	}
 };
 
- 
+//637.average-of-levels-in-binary-tree
+//https://leetcode.cn/problems/average-of-levels-in-binary-tree/
+class Solution_637
+{
+public:
+	vector<double> averageOfLevels(TreeNode * root) {
+		queue<TreeNode*> q;
+		TreeNode* p;
+		q.push(root);
+		vector<double> ans;
+		while (!q.empty())
+		{
+			int len = q.size();
+			double curlayer = 0;
+			for (int i = 0; i < len; ++i)
+			{
+				p = q.front(); q.pop();
+				curlayer += p->val;
+				if (p->left) q.push(p->left);
+				if (p->right) q.push(p->right);
+			}
+			ans.push_back(curlayer / len);
+		}
+		return ans;
+	}
+};
+
+//102. binary-tree-level-order-traversal
+//https://leetcode-cn.com/problems/binary-tree-level-order-traversal/
+class Solution_102 {
+public:
+	vector<vector<int>> levelOrder(TreeNode* root) {
+		vector<vector<int>> ans;
+		if (!root) return ans;
+		queue<TreeNode*> q;
+		q.push(root);
+		TreeNode* p;
+
+		while (!q.empty())
+		{
+			int len = q.size();
+			vector<int> layer;
+			layer.reserve(len);
+			for (int i = 0; i < len; ++i)
+			{
+				p = q.front(); q.pop();
+				if (p->left) q.push(p->left);
+				if (p->right) q.push(p->right);
+				layer.push_back(p->val);
+			}
+			ans.emplace_back(layer);
+		}
+		return ans;
+	}
+};
+
+
+
+
 
 
 
