@@ -2980,8 +2980,73 @@ public:
 };
 
 
+//33. search-in-rotated-sorted-array
+//https://leetcode.cn/problems/search-in-rotated-sorted-array/
+
+class Solution_33 {
+
+};
 
 
+
+
+
+
+
+//153. find-minimum-in-rotated-sorted-array
+//https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/
+class Solution_153
+{
+public:
+	int findMin(vector<int>& nums)
+	{
+		int l = 0, r = nums.size() - 1;
+		while (l < r) {
+			int mid = (r - l >> 1) + l;
+			if (nums[mid] < nums.back()) // 元素互不相同，所以这里 < 等价于 <=
+			{
+				r = mid;
+			}
+			else {
+				l = mid + 1;
+			}
+		}
+		return nums[r];
+	}
+};
+
+//34. find-first-and-last-position-of-element-in-sorted-array
+//https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/
+class Solution_34
+{
+public:
+	vector<int> searchRange(vector<int>& nums, int target) {
+		vector<int> ans;
+		int start = binarySearch(nums, target);
+		if (start<0 || start>nums.size() - 1 || nums[start] != target)
+			return { -1,-1 };
+
+		for (int i = start; i < nums.size() && nums[i] == target; ++i)
+		{
+			ans.push_back(i);
+		}
+		return { ans.front(),ans.back() };
+	}
+
+private:
+	int binarySearch(vector<int>& nums, int target) {
+		int left = 0, right = nums.size() - 1;
+
+		while (left < right) {
+			int mid = ((right - left) >> 1) + left;
+			if (target <= nums[mid])
+				right = mid;
+			else
+				left = mid + 1;
+		}
+		return right;
+	}
+};
 
 
 
