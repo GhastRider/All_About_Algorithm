@@ -3161,9 +3161,93 @@ public:
 	}
 };
 
+
 //149. max-points-on-a-line
 //https://leetcode-cn.com/problems/max-points-on-a-line/
+class Solution_149 {
+public:
+	int maxPoints(vector<vector<int>>& points) {
+		int n = points.size(), ans = 1;
+		for (int i = 0; i < n; ++i) {
+			vector<int> x = points[i];
+			for (int j = i + 1; j < n; ++j) {
+				vector<int> y = points[j];
+				int cnt = 2;
+				for (int k = j + 1; k < n; ++k) {
+					vector<int> p = points[k];
+					int s1 = (y[1] - x[1]) * (p[0] - x[0]);
+					int s2 = (p[1] - x[1]) * (y[0] - x[0]);
+					if (s1 == s2)
+						++cnt;
+				}
+				ans = max(ans, cnt);
+			}
+		}
+		return ans;
+	}
+};
 
+//70. climbing-stairs
+//https://leetcode-cn.com/problems/climbing-stairs/
+class Solution_70 // memorization º«“‰ªØ
+{
+	vector<int> memo;
+	int dfs(int n) {
+		if (memo[n] != -1)
+			return memo[n];
+		memo[n] = dfs(n - 1) + dfs(n - 2);
+		return memo[n];
+	}
+public:
+	int climbStairs(int n) {
+		memo = vector<int>(n + 1, -1);
+		memo[0] = 1;
+		memo[1] = 1;
+
+		return dfs(n);
+	}
+};
+
+class Solution_70_2 //DP
+{
+
+public:
+	int climbStairs(int n) {
+		vector<int> f(n + 1);
+		f[0] = f[1] = 1;
+		for (int i = 2; i <= n; ++i)
+		{
+			f[i] = f[i - 1] + f[i - 2];
+		}
+		return f[n];
+	}
+};
+
+//198. house-robber
+//https://leetcode-cn.com/problems/house-robber/
+class Solution_198
+{
+public:
+	int rob(vector<int>& nums) {
+		int n = nums.size();
+		// vector<vector<int>>(dp(n+1), vector<int>(2));
+		vector<int> f(n + 1);
+		f[0] = 0;
+		f[1] = nums[0];
+		for (int i = 2; i <= n; ++i)
+		{
+			f[i] = max(f[i - 2] + nums[i - 1], f[i - 1]);
+		}
+		return f[n];
+	}
+};
+
+//139. word-break
+//https://leetcode.cn/problems/word-break/
+class Solution_139
+{
+
+};
 
 
 
