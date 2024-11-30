@@ -2863,7 +2863,7 @@ public:
 //https://leetcode.cn/problems/maximum-subarray
 class Solution_53 //前缀和
 {
-	int ans =INT_MIN;
+	int ans = INT_MIN;
 	int min_presum = 0;
 	int presum = 0;
 	for (int x : nums)
@@ -2873,7 +2873,6 @@ class Solution_53 //前缀和
 		min_presum = min(min_presum, presum);
 	}
 	return ans;
-
 };
 
 class Solution_53_2//DP
@@ -2983,14 +2982,48 @@ public:
 //33. search-in-rotated-sorted-array
 //https://leetcode.cn/problems/search-in-rotated-sorted-array/
 
-class Solution_33 {
+class Solution_33
+{
 
+	int binarySearchforMin(const vector<int>& nums) {
+		int l = 0, r = nums.size() - 1;
+		while (l < r) {
+			int mid = (r - l >> 1) + l;
+			if (nums[mid] < nums.back()) {
+				r = mid;
+			}
+			else
+				l = mid + 1;
+		}
+		return r;
+	}
+
+	int binarySearch(const vector<int>& nums, int left, int right, int target) {
+		while (left < right)
+		{
+			int mid = (right - left >> 1) + left;
+			if (target <= nums[mid])
+				right = mid;
+			else
+				left = mid + 1;
+		}
+		return right;
+	}
+public:
+
+	int search(vector<int>& nums, int target) {
+		int minimum_idx = binarySearchforMin(nums);
+		int ans = -1;
+		if (target > nums.back()) {
+			ans = binarySearch(nums, 0, minimum_idx - 1, target);
+		}
+		else {
+			ans = binarySearch(nums, minimum_idx, nums.size() - 1, target);
+		}
+		return (ans < 0 || ans >= nums.size() || nums[ans] != target) ? -1
+			: ans;
+	}
 };
-
-
-
-
-
 
 
 //153. find-minimum-in-rotated-sorted-array
@@ -3047,6 +3080,97 @@ private:
 		return right;
 	}
 };
+
+//66. plus-one
+//https://leetcode-cn.com/problems/plus-one/
+
+class Solution_66
+{
+public:
+	vector<int> plusOne(vector<int>& digits) {
+		for (int i = digits.size() - 1; i >= 0; --i)
+		{
+			digits[i]++;
+			if (digits[i] == 10)
+				digits[i] = 0;
+			else return digits;
+		}
+		digits.insert(digits.begin(), 1);
+		return digits;
+	}
+};
+
+
+//172. factorial-trailing-zeroes
+// https://leetcode.cn/problems/factorial-trailing-zeroes/
+class Solution_172
+{
+	int trailing - zeroes(int n)
+	{
+		while (n)
+		{
+			n /= n;
+			ans += n;
+		}
+		return ans;
+	}
+};
+
+
+//69. sqrtx
+//https://leetcode-cn.com/problems/sqrtx/
+class Solution_69 {
+public:
+	int mySqrt(int x) {
+		int l = 0, r = x;
+		while (l < r) {
+			int mid = ((l - r + 1) >> 1) + r;
+			if (x >= (long)mid * mid)
+			{
+				l = mid;
+			}
+			else
+			{
+				r = mid - 1;
+			}
+		}
+		return r;
+	}
+};
+
+//50. powx-n
+//https://leetcode-cn.com/problems/powx-n/
+class Solution_50 
+{
+public:
+	double myPow(double x, int n) {
+		double ans = 1;
+		long long cur = n;
+		if (n < 0)
+		{
+			n = -n;
+			x = 1 / x;
+		}
+		while (n)
+		{
+			if (n & 1) ans *= x;
+			x *= x;
+			n >>= 1;
+		}
+		return ans;
+	}
+};
+
+//149. max-points-on-a-line
+//https://leetcode-cn.com/problems/max-points-on-a-line/
+
+
+
+
+
+
+
+
 
 
 
