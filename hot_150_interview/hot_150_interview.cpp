@@ -2863,7 +2863,7 @@ public:
 //https://leetcode.cn/problems/maximum-subarray
 class Solution_53 //前缀和
 {
-	int ans =INT_MIN;
+	int ans = INT_MIN;
 	int min_presum = 0;
 	int presum = 0;
 	for (int x : nums)
@@ -2873,7 +2873,6 @@ class Solution_53 //前缀和
 		min_presum = min(min_presum, presum);
 	}
 	return ans;
-
 };
 
 class Solution_53_2//DP
@@ -2983,14 +2982,48 @@ public:
 //33. search-in-rotated-sorted-array
 //https://leetcode.cn/problems/search-in-rotated-sorted-array/
 
-class Solution_33 {
+class Solution_33
+{
 
+	int binarySearchforMin(const vector<int>& nums) {
+		int l = 0, r = nums.size() - 1;
+		while (l < r) {
+			int mid = (r - l >> 1) + l;
+			if (nums[mid] < nums.back()) {
+				r = mid;
+			}
+			else
+				l = mid + 1;
+		}
+		return r;
+	}
+
+	int binarySearch(const vector<int>& nums, int left, int right, int target) {
+		while (left < right)
+		{
+			int mid = (right - left >> 1) + left;
+			if (target <= nums[mid])
+				right = mid;
+			else
+				left = mid + 1;
+		}
+		return right;
+	}
+public:
+
+	int search(vector<int>& nums, int target) {
+		int minimum_idx = binarySearchforMin(nums);
+		int ans = -1;
+		if (target > nums.back()) {
+			ans = binarySearch(nums, 0, minimum_idx - 1, target);
+		}
+		else {
+			ans = binarySearch(nums, minimum_idx, nums.size() - 1, target);
+		}
+		return (ans < 0 || ans >= nums.size() || nums[ans] != target) ? -1
+			: ans;
+	}
 };
-
-
-
-
-
 
 
 //153. find-minimum-in-rotated-sorted-array
@@ -3048,6 +3081,174 @@ private:
 	}
 };
 
+//66. plus-one
+//https://leetcode-cn.com/problems/plus-one/
+
+class Solution_66
+{
+public:
+	vector<int> plusOne(vector<int>& digits) {
+		for (int i = digits.size() - 1; i >= 0; --i)
+		{
+			digits[i]++;
+			if (digits[i] == 10)
+				digits[i] = 0;
+			else return digits;
+		}
+		digits.insert(digits.begin(), 1);
+		return digits;
+	}
+};
+
+
+//172. factorial-trailing-zeroes
+// https://leetcode.cn/problems/factorial-trailing-zeroes/
+class Solution_172
+{
+	int trailingZeroes(int n)
+	{
+		int ans = 0;
+		while (n)
+		{
+			n /= n;
+			ans += n;
+		}
+		return ans;
+	}
+};
+
+
+//69. sqrtx
+//https://leetcode-cn.com/problems/sqrtx/
+class Solution_69 //小于等于target的搜索取值范围内的最大值
+{
+public:
+	int mySqrt(int x) {
+		int l = 0, r = x;
+		while (l < r) {
+			int mid = ((l - r + 1) >> 1) + r;
+			if (x >= (long)mid * mid)
+			{
+				l = mid;
+			}
+			else
+			{
+				r = mid - 1;
+			}
+		}
+		return r;
+	}
+};
+
+//50. powx-n
+//https://leetcode-cn.com/problems/powx-n/
+class Solution_50 
+{
+public:
+	double myPow(double x, int n) {
+		double ans = 1;
+		long long cur = n;
+		if (n < 0)
+		{
+			n = -n;
+			x = 1 / x;
+		}
+		while (n)
+		{
+			if (n & 1) ans *= x;
+			x *= x;
+			n >>= 1;
+		}
+		return ans;
+	}
+};
+
+//149. max-points-on-a-line
+//https://leetcode-cn.com/problems/max-points-on-a-line/
+class Solution_149 {
+public:
+	int maxPoints(vector<vector<int>>& points) {
+		int n = points.size(), ans = 1;
+		for (int i = 0; i < n; ++i) {
+			vector<int> x = points[i];
+			for (int j = i + 1; j < n; ++j) {
+				vector<int> y = points[j];
+				int cnt = 2;
+				for (int k = j + 1; k < n; ++k) {
+					vector<int> p = points[k];
+					int s1 = (y[1] - x[1]) * (p[0] - x[0]);
+					int s2 = (p[1] - x[1]) * (y[0] - x[0]);
+					if (s1 == s2)
+						++cnt;
+				}
+				ans = max(ans, cnt);
+			}
+		}
+		return ans;
+	}
+};
+
+//70. climbing-stairs
+//https://leetcode-cn.com/problems/climbing-stairs/
+class Solution_70 // memorization 记忆化
+{
+	vector<int> memo;
+	int dfs(int n) {
+		if (memo[n] != -1)
+			return memo[n];
+		memo[n] = dfs(n - 1) + dfs(n - 2);
+		return memo[n];
+	}
+public:
+	int climbStairs(int n) {
+		memo = vector<int>(n + 1, -1);
+		memo[0] = 1;
+		memo[1] = 1;
+
+		return dfs(n);
+	}
+};
+
+class Solution_70_2 //DP
+{
+
+public:
+	int climbStairs(int n) {
+		vector<int> f(n + 1);
+		f[0] = f[1] = 1;
+		for (int i = 2; i <= n; ++i)
+		{
+			f[i] = f[i - 1] + f[i - 2];
+		}
+		return f[n];
+	}
+};
+
+//198. house-robber
+//https://leetcode-cn.com/problems/house-robber/
+class Solution_198
+{
+public:
+	int rob(vector<int>& nums) {
+		int n = nums.size();
+		// vector<vector<int>>(dp(n+1), vector<int>(2));
+		vector<int> f(n + 1);
+		f[0] = 0;
+		f[1] = nums[0];
+		for (int i = 2; i <= n; ++i)
+		{
+			f[i] = max(f[i - 2] + nums[i - 1], f[i - 1]);
+		}
+		return f[n];
+	}
+};
+
+//139. word-break
+//https://leetcode.cn/problems/word-break/
+class Solution_139
+{
+
+};
 
 
 
