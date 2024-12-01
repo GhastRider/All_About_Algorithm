@@ -2863,16 +2863,18 @@ public:
 //https://leetcode.cn/problems/maximum-subarray
 class Solution_53 //前缀和
 {
-	int ans = INT_MIN;
-	int min_presum = 0;
-	int presum = 0;
-	for (int x : nums)
-	{
-		presum += x;
-		ans = max(ans, presum - min_presum);
-		min_presum = min(min_presum, presum);
+	int maxSubArray(vector<int>& nums) {
+		int ans = INT_MIN;
+		int min_presum = 0;
+		int presum = 0;
+		for (int x : nums)
+		{
+			presum += x;
+			ans = max(ans, presum - min_presum);
+			min_presum = min(min_presum, presum);
+		}
+		return ans;
 	}
-	return ans;
 };
 
 class Solution_53_2//DP
@@ -3120,8 +3122,7 @@ class Solution_172
 
 //69. sqrtx
 //https://leetcode-cn.com/problems/sqrtx/
-class Solution_69 //小于等于target的搜索取值范围内的最大值
-{
+class Solution_69 {
 public:
 	int mySqrt(int x) {
 		int l = 0, r = x;
@@ -3163,6 +3164,7 @@ public:
 	}
 };
 
+
 //149. max-points-on-a-line
 //https://leetcode-cn.com/problems/max-points-on-a-line/
 class Solution_149 {
@@ -3187,6 +3189,8 @@ public:
 		return ans;
 	}
 };
+
+
 
 //70. climbing-stairs
 //https://leetcode-cn.com/problems/climbing-stairs/
@@ -3245,10 +3249,106 @@ public:
 
 //139. word-break
 //https://leetcode.cn/problems/word-break/
-class Solution_139
-{
 
+class Solution_139//dp    //to think: f[i]true的含义
+{
+public:
+	bool wordBreak(string s, vector<string>& wordDict) {
+		auto maxlen_iterator = max_element(wordDict.begin(), wordDict.end(), [](const string& a, const string& b) {return a.length() < b.length(); });
+
+		int max_len = maxlen_iterator->length();
+		unordered_set<string> words(wordDict.begin(), wordDict.end());
+		int n = s.length();
+		vector<int> f(n + 1);
+		f[0] = true;
+		for (int i = 1; i <= n; ++i)
+		{
+			for (int j = i - 1; j >= max(i - max_len, 0); --j)
+			{
+				if (f[j] && words.count(s.substr(j, i - j))) {
+					f[i] = true;
+					break;
+				}
+			}
+		}
+		return f[n];
+	}
 };
+
+class Solution_139_2//memorization version 1 //to think: mem[idx]true的含义
+{
+public:
+	bool wordBreak(string s, vector<string>& wordDict) {
+		unordered_set<string> wordDic(wordDict.begin(), wordDict.end());
+		vector<int> mem(s.size(), 0);
+
+		auto dfs = [&](auto&& dfs, int idx)->bool {
+			if (idx == s.size())
+			{
+				return true;
+			}
+			if (mem[idx] != 0)
+			{
+				return mem[idx] == 1;
+			}
+			for (int i = idx; i <= s.size(); i++)
+			{
+				if (wordDic.find(s.substr(idx, i - idx)) != wordDic.end() && dfs(dfs, i))
+				{
+					mem[idx] = 1;
+					return true;
+				}
+
+			}
+			mem[idx] = -1;
+			return false;
+
+
+			};
+		return dfs(dfs, 0);
+	}
+};
+
+class Solution_139_3 //memorization version2 //to think: mem[i]true的含义
+{
+	vector<int> memo;
+	int max_len;
+	unordered_set<string> words;
+	string s;
+
+	bool dfs(int i)
+	{
+		if (i == 0) return true;
+		if (memo[i] != -1) return memo[i];
+
+		for (int j = i - 1; j >= max(i - max_len, 0); --j)
+		{
+			if (words.count(s.substr(j, i - j)) && dfs(j))
+			{
+				return memo[i] = true;
+			}
+		}
+		return memo[i] = false;
+	}
+public:
+	bool wordBreak(string s, vector<string>& wordDict) {
+		auto max_len_iterator = max_element(wordDict.begin(), wordDict.end(), [](const string& a, const string& b) {return a.length() < b.length(); });
+		int n = s.length();
+
+		this->s = s;
+		words = unordered_set<string>(wordDict.begin(), wordDict.end());
+		max_len = (*max_len_iterator).length();
+		memo = vector<int>(n + 1, -1);
+		
+		return dfs(n);
+	}
+};
+
+
+//
+
+
+
 
 
 
