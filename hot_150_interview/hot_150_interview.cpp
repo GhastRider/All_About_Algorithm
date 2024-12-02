@@ -3345,11 +3345,75 @@ public:
 };
 
 
-//
+//322. coin-change
+//https://leetcode.cn/problems/coin-change/
 
+class Solution_322 //×î¶ÌÂ· shortest path
+{
+public:
+	int coinChange(vector<int>& coins, int amount) {
+		queue<pair<int, int>> q;
+		vector<bool> vst(amount + 1, false);
+		q.push({ 0,0 });
+		vst[0] = true;
+		while (!q.empty())
+		{
+			auto [current_amount, cnt] = q.front(); q.pop();
+			if (current_amount == amount) return cnt;
+			for (int coin : coins)
+			{
+				if (current_amount <= amount - coin && !vst[current_amount + coin])
+				{
+					q.push({ current_amount + coin, cnt + 1 });
+					vst[current_amount + coin] = true;
+				}
+			}
+		}
+		return -1;
+	}
+};
 
+class Solution_322_2 //DP version_1
+{
+public:
+	int coinChange(vector<int>& coins, int amount) {
+		vector<int> f(amount + 1, INT_MAX - 1);
+		f[0] = 0;
+		for (int i = 1; i <= amount; ++i)
+		{
+			for (int coin : coins)
+			{
+				if (i >= coin)
+				{
+					f[i] = min(f[i], f[i - coin] + 1);
+				}
+			}
+		}
+		return f[amount] == INT_MAX - 1 ? -1 : f[amount];
+	}
 
+};
 
+class Solution_322_2_1 //DP version_2
+{
+public:
+	int coinChange(vector<int>& coins, int amount)
+	{
+		vector<vector<int>> dp(coins.size() + 1, vector<int>(amount + 1, INT_MAX - 1));
+		dp[0][0] = 0;
+		for (int i = 1; i <= coins.size(); ++i)
+		{
+			for (int j = 0; j <= amount; ++j)
+			{
+				dp[i][j] = dp[i - 1][j];
+				if (j >= coins[i - 1])
+				{
+					dp[i][j] = min(dp[i][j], dp[i][j - coins[i - 1]] + 1);
+				}
+			}
+		}
+	}
+};
 
 
 
