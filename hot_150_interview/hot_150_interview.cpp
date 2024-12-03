@@ -487,7 +487,9 @@ public:
 		vst[0] = true;
 		while (!q.empty())
 		{
-			auto [node, cnt] = q.front(); q.pop(); //结构化绑定auto[a,b]是C++17特性
+			//auto [node, cnt] = q.front(); q.pop(); //结构化绑定auto[a,b]是C++17特性
+			auto a = q.front(); q.pop();
+			int node = a.first; int cnt = a.second;
 			if (node == nums.size() - 1) return cnt;
 			for (int i = 1; i <= nums[node]; ++i) {
 				int next_node = node + i;
@@ -765,7 +767,10 @@ public:
 
 string intToRoman(int num) {
 	string roman;
-	for (const auto& [value, symbol] : map) {
+	//for (const auto& [value, symbol] : map) 
+	for(const auto & a :map)
+	{
+		int value = a.first; string symbol = a.second;
 		while (num >= value) {
 			num -= value;
 			roman += symbol;
@@ -2839,7 +2844,7 @@ public:
 	ListNode* mergeKLists(vector<ListNode*>& lists) {
 
 		auto mycompare = [](const LN* a, const LN* b) {return a->val > b->val; };
-		priority_queue<LN*, vector<LN*>, decltype(mycompare)> pq;
+		priority_queue<LN*, vector<LN*>, decltype(mycompare)> pq(mycompare);
 		for (auto head : lists)
 		{
 			if (head)//记得，这里来给输入判空
@@ -2864,7 +2869,7 @@ public:
 class Solution_53 //前缀和
 {
 	int maxSubArray(vector<int>& nums) {
-		int ans = INT_MIN;
+		int ans = numeric_limits<int>::min();
 		int min_presum = 0;
 		int presum = 0;
 		for (int x : nums)
@@ -3358,7 +3363,8 @@ public:
 		vst[0] = true;
 		while (!q.empty())
 		{
-			auto [current_amount, cnt] = q.front(); q.pop();
+			//auto [current_amount, cnt] = q.front(); q.pop();
+			auto a = q.front(); int current_amount = a.first; int cnt = a.second; q.pop();
 			if (current_amount == amount) return cnt;
 			for (int coin : coins)
 			{
@@ -3415,6 +3421,417 @@ public:
 	}
 };
 
+
+
+
+//200.ind-the-number-of-islands
+//https://leetcode.cn/problems/number-of-islands/
+
+class Solution_200 //BFS
+{
+	int m, n;
+	int cnt = 0;
+	int numIslands(vector<vector<char>>& grid)
+	{
+		m = grid.size();
+		n = grid[0].size();
+		for (int i = 0; i < m; ++i)
+		{
+			for (int j = 0; j < n; ++j)
+			{
+				if (grid[i][j] == '1')
+				{
+					bfs(i, j, grid);
+					cnt++;
+				}
+			}
+		}
+		return cnt;
+	}
+
+	vector<vector<int>> dirs = { {0,1},{0,-1},{-1,0},{1,0}};
+	void bfs(int x, int y, vector<vector<char>>& grid)
+	{
+		queue<pair<int, int>> q;
+		q.push({ x,y });
+		grid[x][y] = '0';
+		while (!q.empty())
+		{
+			//auto [cx, cy] = q.front();
+			auto a = q.front();
+			int cx = a.first, cy = a.second;
+			q.pop();
+			for (vector<int> dir : dirs)
+			{
+				int nx = cx + dir[0], ny = cy + dir[1];
+				if (nx < 0 || ny < 0 || nx >= m || ny >= n || grid[nx][ny] == '0') continue;
+				q.push({ nx,ny });
+				grid[nx][ny] = '0';
+			}
+		}
+	}
+};
+
+
+class Solution_300_2 //DFS
+{
+public:
+	int m, n;
+
+	int numIslands(vector<vector<char>>& grid) {
+		m = grid.size();
+		n = grid[0].size();
+		int cnt = 0;
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (grid[i][j] == '1') {
+					dfs(i, j, grid);
+					++cnt;
+				}
+			}
+		}
+		return cnt;
+	}
+
+	vector<vector<int>> dirs = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
+	void dfs(int x, int y, vector<vector<char>>& grid) {
+		grid[x][y] = '0';
+		for (const auto& dir : dirs) {
+			int nx = x + dir[0], ny = y + dir[1];
+			if (nx < 0 || ny < 0 || nx >= m || ny >= n || grid[nx][ny] != '1')
+				continue;
+			dfs(nx, ny, grid);
+		}
+	}
+};
+
+
+
+//130. surrounded-regions
+//https://leetcode.cn/problems/surrounded-regions/
+class Solution_130 //DFS 染色
+{
+	int m, n;
+public:
+	void solve(vector<vector<char>>& board) {
+		m = board.size();
+		n = board[0].size();
+
+		for (int i = 0; i < m; ++i)
+		{
+			if (board[i][0] == 'O') dfs(i, 0, board);
+			if (board[i][n - 1] == 'O') dfs(i, n - 1, board);
+		}
+		for (int j = 0; j < n; ++j)
+		{
+			if (board[0][j] == 'O') dfs(0, j, board);
+			if (board[m - 1][j] == 'O') dfs(m - 1, j, board);
+		}
+		for (int i = 0; i < m; ++i)
+		{
+			for (int j = 0; j < n; ++j)
+			{
+				char& now = board[i][j];
+				if (now == 'O')
+					now = 'X';
+				else if (now == 'Y')
+					now = 'O';
+			}
+		}
+	}
+	const vector<vector<char>> dirs = { {0,1},{0,-1},{1,0},{-1,0} };
+	void dfs(int x, int y, vector<vector<char>>& board)
+	{
+		if (board[x][y] == 'O')
+			board[x][y] = 'Y';
+		for (auto dir : dirs)
+		{
+			int nx = x + dir[0], ny = y + dir[1];
+			if (nx < 0 || ny < 0 || nx >= m || ny >= n || board[nx][ny] != 'O') continue; 
+			dfs(nx, ny, board);
+		}
+	}
+
+};
+
+
+
+
+
+struct GNode {
+	int val;
+	vector<GNode*> neighbors;
+	GNode() :val(0), neighbors(vector<GNode*>()) {}
+	GNode(int _val) : val(_val) {}
+	GNode(int _val, vector<GNode*> _neighbors) : val(_val), neighbors(_neighbors) {}
+};
+
+
+//133. clone-graph
+//https://leetcode.cn/problems/clone-graph/
+
+class Solution_133 //BFS
+{
+public:
+	using GN = GNode;
+	GN* cloneGraph(GN* node) {
+		if (node == nullptr) return nullptr;
+		unordered_map<GN*, GN*> mp;
+
+		queue<GN*> q;
+		q.push(node);
+		mp[node] = new GN(node->val);
+
+		while (!q.empty())
+		{
+			auto curnode = q.front(); q.pop();
+			for (auto neighbor : curnode->neighbors)
+			{
+				if (!mp.count(neighbor))
+				{
+					mp[neighbor] = new GN(neighbor->val);
+					q.push(neighbor);
+				}
+				mp[curnode]->neighbors.push_back(mp[neighbor]);
+			}
+		}
+		return mp[node];
+	}
+};
+
+
+class Solution_133_2 //DFS
+{
+	using GN = GNode;
+public:
+	GN* cloneGraph(GN* node) {
+		unordered_map<GN*, GN*> mp;
+
+		return dfs(mp, node);
+	}
+
+	GN* dfs(unordered_map<GN*, GN*>& mp, GN* curnode) {
+		if (curnode == nullptr)
+			return nullptr;
+
+		if (!mp.count(curnode)) {
+			mp[curnode] = new GN(curnode->val);
+			for (auto neighbor : curnode->neighbors) {
+				// 错误写法：mp[neighbor] = dfs(mp,neighbor);
+				mp[curnode]->neighbors.emplace_back(dfs(mp, neighbor));
+			}
+		}
+		return mp[curnode];
+	}
+};
+
+
+//399. evaluate-division 除法求职
+//https://leetcode.cn/problems/evaluate-division/
+// -unfinished
+
+
+
+//17. letter-combinations-of-a-phone-number
+//https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/
+class Solution_17 //traceback
+{
+	string digits;
+	int n;
+	unordered_map<int, string> dial{
+		{2, "abc"}, {3, "def"},  {4, "ghi"}, {5, "jkl"},
+		{6, "mno"}, {7, "pqrs"}, {8, "tuv"}, {9, "wxyz"},
+	};
+	vector<string> ans;
+	void dfs(string& path, int i) {
+		if (i == n) {
+			ans.emplace_back(path);
+			return;
+		}
+		for (const char(c) : dial[digits[i] - '0']) {
+			path[i] = (c);
+			dfs(path, 1 + i);
+			// path.pop_back();
+		}
+	};
+
+public:
+	vector<string> letterCombinations(string digits) {
+		this->digits = digits;
+		this->n = digits.length();
+		string path(n, '\0');
+
+		if (n == 0)
+			return {};
+		dfs(path, 0);
+		return ans;
+	}
+};
+
+//77. combinations
+//https://leetcode.cn/problems/combinations/
+class Solution_77
+{
+public:
+	vector<vector<int>> combine(int n, int k) {
+		vector<vector<int>> ans;
+		vector<int> path;
+		auto dfs = [&](auto&& dfs, int idx) {
+			if (path.size() == k) {
+				ans.emplace_back(path);
+				return;
+			}
+			for (int i = idx; i <= n; ++i)
+			{
+				path.emplace_back(i);
+				dfs(dfs, i + 1);
+				path.pop_back();
+			}
+			};
+		dfs(dfs, 1);
+		return ans;
+	}
+};
+
+//46. permutations
+//https://leetcode.cn/problems/permutations/
+class Solution_46
+{
+public:
+	vector<vector<int>> permute(vector<int>& nums) {
+		int n = nums.size();
+		vector<vector<int>> ans;
+		vector<int> path;
+		vector<bool> visited(nums.size(), false);
+
+		auto dfs = [&](auto&& dfs) {
+			if (path.size() == n) {
+				ans.emplace_back(path);
+				return;
+			}
+			for (int i = 0; i < n; ++i) {
+				if (visited[i])
+					continue;
+				visited[i] = true;
+				path.emplace_back(nums[i]);
+				dfs(dfs);
+				visited[i] = false;
+				path.pop_back();
+			}
+			};
+		dfs(dfs);
+		return ans;
+	}
+
+};
+
+
+
+//39. combination-sum
+//https://leetcode.cn/problems/combination-sum/
+class Solution_39 //两种答案保证无重复组合方式之一：sort candidates
+{
+public:
+	vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+		vector<int> path;
+		vector<vector<int>> ans;
+		int n = candidates.size();
+		sort(candidates.begin(), candidates.end());//candidates有序
+		function<void(int, int)> dfs = [&](int idx, int cur_sum) {
+
+			if (cur_sum == target)
+			{
+				ans.push_back(path);
+				return;
+			}
+			for (size_t i = idx; i < n; ++i)
+			{
+				if (candidates[i] + cur_sum > target) return;
+				path.emplace_back(candidates[i]);
+				dfs(i, cur_sum + candidates[i]);//不是i+1，因为可以重复使用当前元素，但不能继续使用[i]之前的元素,防止生成重复组合
+				path.pop_back();
+			}
+			};
+		dfs(0, 0);
+		return ans;
+	}
+};
+
+
+class Solution_39_2 //之二：保证生成path有序
+{
+public:
+	vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+		vector<vector<int>> ans;
+		vector<int> path;
+		// sort(candidates.begin(),candidates.end());
+		int n = candidates.size();
+
+		auto dfs = [&](auto&& dfs, int sum)
+			{
+				if (sum > target) return;
+				if (sum == target) { ans.emplace_back(path); return; }
+
+				for (int i = 0; i < n; ++i)
+				{
+					if (path.size() > 0 && candidates[i] < path.back()) continue;//保证path生成有序
+					sum += candidates[i];
+					path.emplace_back(candidates[i]);
+					dfs(dfs, sum);
+					sum -= candidates[i];
+					path.pop_back();
+				}
+			};
+		dfs(dfs, 0);
+		return ans;
+	}
+};
+
+//52. n-queens-ii
+//https://leetcode.cn/problems/n-queens-ii/
+class Solution_52{};
+
+
+
+// 22. generate-parentheses
+//https://leetcode.cn/problems/generate-parentheses/
+
+
+
+
+// 79. word-search
+//https://leetcode.cn/problems/word-search/
+
+
+
+
+////Solution_17
+//int main()
+//{
+//	Solution_17 solution;
+//	vector<string> ans = solution.letterCombinations("23");
+//	for (auto a : ans)
+//	{
+//		cout << a << " ";
+//	}
+//	cout << endl;
+//	return 0;
+//}
+
+
+
+
+
+////Solution_300_2
+//int main()
+//{
+//	vector<vector<char>> input =
+//	{{'1', '1', '1', '1', '0'}, {'1', '1', '0', '1', '0'}, {'1', '1', '0', '0', '0'}, {'0', '0', '0', '0', '0'}};
+//	Solution_300_3 solve;
+//	int res = solve.numIslands(input);
+//	cout << res << endl;
+//	
+//}
 
 
 
