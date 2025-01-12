@@ -3787,20 +3787,185 @@ public:
 	}
 };
 
+
+//51. n-queens
+//https://leetcode-cn.com/problems/n-queens/
+class Solution_51
+{
+private:
+	void backtrace(vector<vector<string>>& solutions, vector<int>& queens,
+		int n, int row, vector<int>& diagonal1,
+		vector<int>& diagonal2, vector<int>& columns) {
+		if (row == n) {
+			solutions.emplace_back(getSolutions(queens, n));
+		}
+
+		for (int i = 0; i < n; ++i) {
+			if (columns[i] || diagonal1[i + row] || diagonal2[n - row + i])
+				continue;
+			queens[row] = i;
+			columns[i] = diagonal1[i + row] = diagonal2[n - row + i] = 1;
+			backtrace(solutions, queens, n, row + 1, diagonal1, diagonal2,
+				columns);
+			columns[i] = diagonal1[i + row] = diagonal2[n - row + i] = 0;
+		}
+	}
+
+	vector<string> getSolutions(vector<int> queens, int n) {
+		vector<string> board(n, string(n, '.'));
+		for (int i = 0; i < n; ++i) {
+			board[i][queens[i]] = 'Q';
+		}
+		return board;
+	}
+
+public:
+	vector<vector<string>> solveNQueens(int n) {
+		vector<vector<string>> solutions;
+		vector<int> queens(n, -1);
+		vector<int> columns(30, 0), diagonal1(30, 0), diagonal2(30, 0);
+		backtrace(solutions, queens, n, 0, diagonal1, diagonal2, columns);
+		return solutions;
+	}
+};
+
+
+
 //52. n-queens-ii
 //https://leetcode.cn/problems/n-queens-ii/
-class Solution_52{};
+class Solution_52 //--unfinished
+{
+
+};
 
 
 
 // 22. generate-parentheses
 //https://leetcode.cn/problems/generate-parentheses/
 
+class Solution_22
+{
+public:
+	vector<string> generateParenthesis(int n) {
+		int m = n * 2;
+		vector<string> ans;
+		string path(m, 0);
+
+		auto dfs = [&](auto&& dfs, int i, int open)
+			{
+				if (i == m)
+				{
+					ans.emplace_back(path);
+					return;
+				}
+				if (open < n) {
+					path[i] = '(';
+					dfs(dfs, i + 1, open + 1);
+				}
+				if (i - open < open) {
+					path[i] = ')';
+					dfs(dfs, i + 1, open);
+				}
+			};
+		dfs(dfs, 0, 0);
+		return ans;
+	}
+};
+
 
 
 
 // 79. word-search
 //https://leetcode.cn/problems/word-search/
+
+
+class Solution_79
+{
+private:
+	int m, n;
+	bool res = false;
+	vector<vector<int>> dirs{ {0, 1}, {0, -1}, {1, 0}, {-1, 0} };
+
+public:
+	bool exist(vector<vector<char>>& board, string word) {
+		this->m = board.size(), this->n = board[0].size();
+		vector<vector<bool>> visited(m, vector<bool>(n, false));
+
+		auto dfs = [&](auto&& dfs, int p, int x, int y) {
+			if (p == word.size()) {
+				res = true;
+				return;
+			}
+			for (auto &dir : dirs) {
+				int nx = x + dir[0], ny = y + dir[1];
+				if (nx < 0 || ny < 0 || nx >= m || ny >= n ||
+					board[nx][ny] != word[p] || visited[nx][ny])
+					continue;
+
+				visited[nx][ny] = true;
+				dfs(dfs, p + 1, nx, ny);
+				visited[nx][ny] = false;
+			}
+			};
+
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				if (board[i][j] == word[0]) {
+					visited[i][j] = true;
+					dfs(dfs, 1, i, j);
+					visited[i][j] = false;
+				}
+			}
+		}
+		return res;
+	}
+};
+
+
+class Solution_79_2
+{
+private:
+	int m, n;
+	bool res = false;
+	vector<vector<int>> dirs{ {0, 1}, {0, -1}, {1, 0}, {-1, 0} };
+
+public:
+	bool exist(vector<vector<char>>& board, string word) {
+		this->m = board.size(), this->n = board[0].size();
+
+		auto dfs = [&](auto&& dfs, int p, int x, int y) {
+			if (x < 0 || y < 0 || x >= m || y >= n || board[x][y] != word[p])
+				return;
+			if (p + 1 == word.size()) {
+				res = true;
+				return;
+			}
+			board[x][y] = '\0';
+			for (const auto& dir : dirs) {
+				int nx = x + dir[0], ny = y + dir[1];
+				dfs(dfs, p + 1, nx, ny);
+			}
+			board[x][y] = word[p];
+			};
+
+		for (int i = 0; i < m; ++i) {
+			for (int j = 0; j < n; ++j) {
+				dfs(dfs, 0, i, j);
+			}
+		}
+		return res;
+	}
+};
+
+
+
+
+
+
+
+
+
+
 
 
 
